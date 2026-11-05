@@ -162,3 +162,20 @@ corresponde a 25.7 — Testing frontend.
 
 Los pasos de verificación técnica de 25.2
 se ejecutan localmente antes de su cierre.
+
+## Cliente API tipado
+
+El cliente HTTP utiliza `openapi-fetch` y tipos
+generados mediante `openapi-typescript`.
+
+El contrato OpenAPI del backend se conserva en:
+
+`contracts/booking-v1.openapi.json`
+
+Generación y verificación:
+
+```powershell
+pnpm api:validate
+pnpm api:generate
+pnpm api:check
+```
