@@ -1,0 +1,5220 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Bookify.Services.Booking.Api | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:7071/"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Bookify.Services.Booking.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/diagnostics/time": {
+      "get": {
+        "tags": [
+          "Bookify.Services.Booking.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/diagnostics/database": {
+      "get": {
+        "tags": [
+          "Bookify.Services.Booking.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/diagnostics/database/model": {
+      "get": {
+        "tags": [
+          "Bookify.Services.Booking.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/properties": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Gets a filtered, sorted and paged list of properties.",
+        "operationId": "Properties.List",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "description": "One-based page number. Defaults to 1 when omitted.",
+            "schema": {
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Number of items per page. Defaults to 20. Minimum: 1. Maximum: 100.",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isActive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResponseOfPropertyListItemResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests. The configured rate limit was exceeded. Returns application/problem+json with code RateLimit.Exceeded. Retry-After may be present when the limiter can calculate it.",
+            "headers": {
+              "Retry-After": {
+                "description": "Optional number of seconds to wait before retrying.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "status": {
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "null",
+                        "integer",
+                        "string"
+                      ],
+                      "format": "int32"
+                    },
+                    "detail": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "instance": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Creates a property.",
+        "operationId": "Properties.Create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePropertyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatePropertyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/properties/{propertyId}": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Gets a property by its identifier.",
+        "operationId": "Properties.GetById",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPropertyByIdResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests. The configured rate limit was exceeded. Returns application/problem+json with code RateLimit.Exceeded. Retry-After may be present when the limiter can calculate it.",
+            "headers": {
+              "Retry-After": {
+                "description": "Optional number of seconds to wait before retrying.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "status": {
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "null",
+                        "integer",
+                        "string"
+                      ],
+                      "format": "int32"
+                    },
+                    "detail": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "instance": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Updates property details and stay schedules.",
+        "operationId": "Properties.Update",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePropertyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/properties/{propertyId}/units": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Gets the active rentable units publicly available for a property.",
+        "operationId": "Properties.GetUnits",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPropertyUnitsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests. The configured rate limit was exceeded. Returns application/problem+json with code RateLimit.Exceeded. Retry-After may be present when the limiter can calculate it.",
+            "headers": {
+              "Retry-After": {
+                "description": "Optional number of seconds to wait before retrying.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "status": {
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "null",
+                        "integer",
+                        "string"
+                      ],
+                      "format": "int32"
+                    },
+                    "detail": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "instance": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/properties/{propertyId}/availability": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Gets the rentable units available for a requested stay period and guest count.",
+        "operationId": "Properties.GetAvailability",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "checkInDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "checkOutDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "guestCount",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAvailabilityResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests. The configured rate limit was exceeded. Returns application/problem+json with code RateLimit.Exceeded. Retry-After may be present when the limiter can calculate it.",
+            "headers": {
+              "Retry-After": {
+                "description": "Optional number of seconds to wait before retrying.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "status": {
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "null",
+                        "integer",
+                        "string"
+                      ],
+                      "format": "int32"
+                    },
+                    "detail": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "instance": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/properties/{propertyId}/status": {
+      "patch": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Activates or deactivates a property.",
+        "operationId": "Properties.SetStatus",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPropertyStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Creates a new booking.",
+        "operationId": "Bookings.Create",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Required for this operation. Reuse the same key only when retrying the same logical request with an identical payload. A different logical operation requires a new key. Maximum length: 255 characters",
+            "required": true,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Booking-Guest-Token": {
+                "description": "Returned only for a newly created anonymous booking. Contains the opaque guest access credential. Capture it immediately and store it securely. It is not included in the JSON body and is not reissued on an idempotency replay.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateBookingResponse"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests. The configured rate limit was exceeded. Returns application/problem+json with code RateLimit.Exceeded. Retry-After may be present when the limiter can calculate it.",
+            "headers": {
+              "Retry-After": {
+                "description": "Optional number of seconds to wait before retrying.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "status": {
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "null",
+                        "integer",
+                        "string"
+                      ],
+                      "format": "int32"
+                    },
+                    "detail": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "instance": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bookings/{identifier}": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Gets a booking by ID or public booking reference.",
+        "operationId": "Bookings.GetByIdentifier",
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetBookingResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          },
+          {
+            "BookingGuestToken": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings/{bookingId}/approve": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Approves a pending booking.",
+        "operationId": "Bookings.Approve",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings/{bookingId}/reject": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Rejects a pending booking.",
+        "operationId": "Bookings.Reject",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings/{bookingId}/cancel": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Cancels a booking before payment.",
+        "operationId": "Bookings.Cancel",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          },
+          {
+            "BookingGuestToken": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/payments": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Initiates a payment for a booking.",
+        "operationId": "Payments.Initiate",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Required for this operation. Reuse the same key only when retrying the same logical request with an identical payload. A different logical operation requires a new key. Maximum length: 255 characters",
+            "required": true,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitiatePaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InitiatePaymentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Request processing error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "An operation exceeded an upstream or infrastructure timeout. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests. The configured rate limit was exceeded. Returns application/problem+json with code RateLimit.Exceeded. Retry-After may be present when the limiter can calculate it.",
+            "headers": {
+              "Retry-After": {
+                "description": "Optional number of seconds to wait before retrying.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "status": {
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "null",
+                        "integer",
+                        "string"
+                      ],
+                      "format": "int32"
+                    },
+                    "detail": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "instance": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          },
+          {
+            "BookingGuestToken": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/payments/webhooks/stripe": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Receives Stripe payment webhook events.",
+        "operationId": "Payments.StripeWebhook",
+        "requestBody": {
+          "description": "Original, unmodified Stripe webhook JSON payload. The server validates Stripe-Signature against the raw request body. Do not re-serialize or modify a signed payload.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "An operation exceeded an upstream or infrastructure timeout. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests. The configured rate limit was exceeded. Returns application/problem+json with code RateLimit.Exceeded. Retry-After may be present when the limiter can calculate it.",
+            "headers": {
+              "Retry-After": {
+                "description": "Optional number of seconds to wait before retrying.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "title": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "status": {
+                      "pattern": "^-?(?:0|[1-9]\\d*)$",
+                      "type": [
+                        "null",
+                        "integer",
+                        "string"
+                      ],
+                      "format": "int32"
+                    },
+                    "detail": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "instance": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "StripeSignature": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/payments/bookings/{bookingId}/status": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Gets the authoritative payment status for a booking.",
+        "operationId": "Payments.GetStatus",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPaymentStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          },
+          {
+            "BookingGuestToken": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/units": {
+      "post": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "Creates a rentable unit for a property.",
+        "operationId": "AdminRentableUnits.Create",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRentableUnitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateRentableUnitResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "List all rentable units, including inactive units.",
+        "operationId": "AdminRentableUnits.List",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAdminRentableUnitsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/units/{unitId}": {
+      "get": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "Gets an administrative rentable unit detail.",
+        "operationId": "AdminRentableUnits.GetById",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRentableUnitResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "Updates rentable unit detail and capacity.",
+        "operationId": "AdminRentableUnits.Update",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRentableUnitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/units/{unitId}/status": {
+      "patch": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "Activates or deactivates a rentable unit.",
+        "operationId": "AdminRentableUnits.SetStatus",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetRentableUnitStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/units/{unitId}/pricing": {
+      "get": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "Gets the base pricing configuration of a rentable unit.",
+        "operationId": "AdminRentableUnits.GetPricing",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAdminRentableUnitPricingResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "Configures the base pricing of a rentable unit.",
+        "operationId": "AdminRentableUnits.ConfigurePricing",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigureRentableUnitPricingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/units/{unitId}/seasons": {
+      "post": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "Creates a pricing season for a rentable unit.",
+        "operationId": "AdminRentableUnits.CreateSeason",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePricingSeasonRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatePricingSeasonResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "Lists active and inactive pricing seasons.",
+        "operationId": "AdminRentableUnits.ListSeason",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAdminPricingSeasonsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/units/{unitId}/seasons/{seasonId}": {
+      "get": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "Gets a pricing season by its identifier.",
+        "operationId": "AdminRentableUnits.GetSeasonById",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "seasonId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPricingSeasonResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "Updates pricing season dates, rate and priority",
+        "operationId": "AdminRentableUnits.UpdateSeason",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "seasonId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePricingSeasonRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/units/{unitId}/seasons/{seasonId}/status": {
+      "patch": {
+        "tags": [
+          "Admin RentableUnits"
+        ],
+        "summary": "Activates or deactivates a pricing season.",
+        "operationId": "AdminRentableUnits.SetSeasonStatus",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "seasonId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPricingSeasonStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/bookings": {
+      "get": {
+        "tags": [
+          "Admin Bookings"
+        ],
+        "summary": "Get filtered and paged administrative bookings.",
+        "operationId": "AdminBookings.List",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "description": "One-based page number. Defaults to 1 when omitted.",
+            "schema": {
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Number of items per page. Defaults to 20. Minimum: 1. Maximum: 100.",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 20
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rangeStart",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "rangeEnd",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "customerSubjectId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResponseOfAdminBookingListItemResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/bookings/{bookingId}": {
+      "get": {
+        "tags": [
+          "Admin Bookings"
+        ],
+        "summary": "Gets the administrative details of a booking.",
+        "operationId": "AdminBookings.GetById",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBookingDetailsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/bookings/{bookingId}/approve": {
+      "post": {
+        "tags": [
+          "Admin Bookings"
+        ],
+        "summary": "Approves a pending booking within the specified property.",
+        "operationId": "AdminBookings.Approve",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/bookings/{bookingId}/reject": {
+      "post": {
+        "tags": [
+          "Admin Bookings"
+        ],
+        "summary": "Rejects a pending booking within the specified property.",
+        "operationId": "AdminBookings.Reject",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict with the current resource state or request consistency rules. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/bookings/{bookingId}/payment": {
+      "get": {
+        "tags": [
+          "Admin Bookings"
+        ],
+        "summary": "Gets administrative payment details and attempts for a booking.",
+        "operationId": "AdminBookings.GetPayment",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAdminBookingPaymentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/properties/{propertyId}/calendar": {
+      "get": {
+        "tags": [
+          "Admin Bookings"
+        ],
+        "summary": "Gets the administrative booking calendar for a property.",
+        "operationId": "AdminBookings.GetCalendar",
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "rangeStart",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "rangeEnd",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "blocksInventory",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAdminBookingCalendarResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "400": {
+            "description": "Invalid request or validation error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested resource was not found. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error. The response uses RFC 9457 Problem Details with standard fields such as type, title, status, detail and instance. Bookify error responses may include the extensions code, traceId and correlationId where applicable. Do not assume all extensions are present in every error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdminBookingCalendarItemResponse": {
+        "required": [
+          "bookingId",
+          "rentableUnitId",
+          "rentableUnitName",
+          "checkInDate",
+          "checkOutDate",
+          "guestCount",
+          "status",
+          "blocksInventory"
+        ],
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rentableUnitId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rentableUnitName": {
+            "type": "string"
+          },
+          "checkInDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "checkOutDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "guestCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "status": {
+            "type": "string"
+          },
+          "blocksInventory": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AdminBookingDetailsResponse": {
+        "required": [
+          "id",
+          "bookingReference",
+          "propertyId",
+          "propertyName",
+          "rentableUnitId",
+          "rentableUnitName",
+          "customerSubjectId",
+          "checkInDate",
+          "checkOutDate",
+          "numberOfNights",
+          "guestCount",
+          "guestFullName",
+          "guestEmail",
+          "guestPhone",
+          "accommodationPrice",
+          "extraGuestPrice",
+          "totalPrice",
+          "currency",
+          "status",
+          "cancellationReason",
+          "paymentStatus",
+          "createdAtUtc",
+          "approvalDueAtUtc",
+          "approvedAtUtc",
+          "paymentDueAtUtc",
+          "paidAtUtc",
+          "cancelledAtUtc",
+          "completedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookingReference": {
+            "type": "string"
+          },
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "propertyName": {
+            "type": "string"
+          },
+          "rentableUnitId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rentableUnitName": {
+            "type": "string"
+          },
+          "customerSubjectId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "checkInDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "checkOutDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "numberOfNights": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "guestCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "guestFullName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "guestEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "guestPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "accommodationPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "extraGuestPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "totalPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "cancellationReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "paymentStatus": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "approvalDueAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "approvedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "paymentDueAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "paidAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "cancelledAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "completedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "AdminBookingListItemResponse": {
+        "required": [
+          "id",
+          "bookingReference",
+          "propertyId",
+          "rentableUnitId",
+          "rentableUnitName",
+          "customerSubjectId",
+          "guestFullName",
+          "checkInDate",
+          "checkOutDate",
+          "guestCount",
+          "status",
+          "totalPrice",
+          "currency",
+          "createdAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookingReference": {
+            "type": "string"
+          },
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rentableUnitId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rentableUnitName": {
+            "type": "string"
+          },
+          "customerSubjectId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "guestFullName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "checkInDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "checkOutDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "guestCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "status": {
+            "type": "string"
+          },
+          "totalPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "AdminPaymentAttemptResponse": {
+        "required": [
+          "id",
+          "status",
+          "externalReference",
+          "amount",
+          "currency",
+          "createdAtUtc",
+          "completedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "externalReference": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "AdminPaymentDetailsResponse": {
+        "required": [
+          "id",
+          "status",
+          "amount",
+          "currency",
+          "createdAtUtc",
+          "updatedAtUtc",
+          "completedAtUtc",
+          "hasPendingInitiation",
+          "pendingInitiationCreatedAtUtc",
+          "attempts"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "hasPendingInitiation": {
+            "type": "boolean"
+          },
+          "pendingInitiationCreatedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminPaymentAttemptResponse"
+            }
+          }
+        }
+      },
+      "AdminPricingSeasonResponse": {
+        "required": [
+          "id",
+          "startDate",
+          "endDate",
+          "nightlyRate",
+          "currency",
+          "priority",
+          "isActive"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "nightlyRate": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "priority": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AdminRentableUnitResponse": {
+        "required": [
+          "id",
+          "propertyId",
+          "propertyName",
+          "name",
+          "type",
+          "maximumCapacity",
+          "maxBaseGuests",
+          "isActive",
+          "isEntireProperty"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "propertyName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "maximumCapacity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "maxBaseGuests": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isEntireProperty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AvailabilityQuoteResponse": {
+        "required": [
+          "accommodationPrice",
+          "extraGuestPrice",
+          "totalPrice",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "accommodationPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "extraGuestPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "totalPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "AvailableRentableUnitResponse": {
+        "required": [
+          "id",
+          "name",
+          "type",
+          "maximumCapacity",
+          "isEntireProperty",
+          "quote"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "maximumCapacity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "isEntireProperty": {
+            "type": "boolean"
+          },
+          "quote": {
+            "$ref": "#/components/schemas/AvailabilityQuoteResponse"
+          }
+        }
+      },
+      "ConfigureRentableUnitPricingRequest": {
+        "required": [
+          "regularNightlyRate",
+          "weekendNightlyRate",
+          "extraGuestNightlyRate",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "regularNightlyRate": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "weekendNightlyRate": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "extraGuestNightlyRate": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateBookingGuestRequest": {
+        "required": [
+          "fullName",
+          "email",
+          "phone"
+        ],
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CreateBookingPriceResponse": {
+        "required": [
+          "accommodationPrice",
+          "extraGuestPrice",
+          "totalPrice",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "accommodationPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "extraGuestPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "totalPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateBookingRequest": {
+        "required": [
+          "propertyId",
+          "rentableUnitId",
+          "checkInDate",
+          "checkOutDate",
+          "guestCount",
+          "guest"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rentableUnitId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "checkInDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "checkOutDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "guestCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "guest": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CreateBookingGuestRequest"
+              }
+            ]
+          }
+        }
+      },
+      "CreateBookingResponse": {
+        "required": [
+          "id",
+          "bookingReference",
+          "createdAtUtc",
+          "status",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookingReference": {
+            "type": "string"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "price": {
+            "$ref": "#/components/schemas/CreateBookingPriceResponse"
+          }
+        }
+      },
+      "CreatePricingSeasonRequest": {
+        "required": [
+          "startDate",
+          "endDate",
+          "nightlyRate",
+          "currency",
+          "priority"
+        ],
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "nightlyRate": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "priority": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "CreatePricingSeasonResponse": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "CreatePropertyRequest": {
+        "required": [
+          "name",
+          "timeZoneId",
+          "checkInTime",
+          "checkOutTime"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "timeZoneId": {
+            "type": "string"
+          },
+          "checkInTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "checkOutTime": {
+            "type": "string",
+            "format": "time"
+          }
+        }
+      },
+      "CreatePropertyResponse": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "CreateRentableUnitRequest": {
+        "required": [
+          "name",
+          "type",
+          "maximumCapacity",
+          "maxBaseGuests"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "maximumCapacity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "maxBaseGuests": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "CreateRentableUnitResponse": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "GetAdminBookingCalendarResponse": {
+        "required": [
+          "propertyId",
+          "rangeStart",
+          "rangeEnd",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rangeStart": {
+            "type": "string",
+            "format": "date"
+          },
+          "rangeEnd": {
+            "type": "string",
+            "format": "date"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminBookingCalendarItemResponse"
+            }
+          }
+        }
+      },
+      "GetAdminBookingPaymentResponse": {
+        "required": [
+          "propertyId",
+          "bookingId",
+          "bookingStatus",
+          "payment"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookingStatus": {
+            "type": "string"
+          },
+          "payment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AdminPaymentDetailsResponse"
+              }
+            ]
+          }
+        }
+      },
+      "GetAdminPricingSeasonsResponse": {
+        "required": [
+          "propertyId",
+          "unitId",
+          "seasons"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "unitId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "seasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminPricingSeasonResponse"
+            }
+          }
+        }
+      },
+      "GetAdminRentableUnitPricingResponse": {
+        "required": [
+          "propertyId",
+          "unitId",
+          "isConfigured",
+          "regularNightlyRate",
+          "weekendNightlyRate",
+          "extraGuestNightlyRate",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "unitId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isConfigured": {
+            "type": "boolean"
+          },
+          "regularNightlyRate": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "weekendNightlyRate": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "extraGuestNightlyRate": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "GetAdminRentableUnitsResponse": {
+        "required": [
+          "propertyId",
+          "units"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminRentableUnitResponse"
+            }
+          }
+        }
+      },
+      "GetAvailabilityResponse": {
+        "required": [
+          "propertyId",
+          "propertyName",
+          "checkInDate",
+          "checkOutDate",
+          "numberOfNights",
+          "guestCount",
+          "availableUnits"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "propertyName": {
+            "type": "string"
+          },
+          "checkInDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "checkOutDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "numberOfNights": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "guestCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "availableUnits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AvailableRentableUnitResponse"
+            }
+          }
+        }
+      },
+      "GetBookingGuestResponse": {
+        "required": [
+          "fullName",
+          "email",
+          "phone"
+        ],
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
+      "GetBookingPriceResponse": {
+        "required": [
+          "accommodationPrice",
+          "extraGuestPrice",
+          "totalPrice",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "accommodationPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "extraGuestPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "totalPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "GetBookingRentableUnitResponse": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "GetBookingResponse": {
+        "required": [
+          "id",
+          "bookingReference",
+          "propertyId",
+          "propertyName",
+          "rentableUnit",
+          "checkInDate",
+          "checkOutDate",
+          "numberOfNights",
+          "guestCount",
+          "guest",
+          "price",
+          "status",
+          "cancellationReason",
+          "paymentStatus",
+          "createdAtUtc",
+          "approvalDueAtUtc",
+          "approvedAtUtc",
+          "paymentDueAtUtc",
+          "paidAtUtc",
+          "cancelledAtUtc",
+          "completedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookingReference": {
+            "type": "string"
+          },
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "propertyName": {
+            "type": "string"
+          },
+          "rentableUnit": {
+            "$ref": "#/components/schemas/GetBookingRentableUnitResponse"
+          },
+          "checkInDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "checkOutDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "numberOfNights": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "guestCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "guest": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/GetBookingGuestResponse"
+              }
+            ]
+          },
+          "price": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/GetBookingPriceResponse"
+              }
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "cancellationReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "paymentStatus": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "approvalDueAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "approvedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "paymentDueAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "paidAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "cancelledAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "completedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "GetPaymentStatusResponse": {
+        "required": [
+          "bookingId",
+          "bookingStatus",
+          "paymentStatus",
+          "paymentAttemptStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookingStatus": {
+            "type": "string"
+          },
+          "paymentStatus": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "paymentAttemptStatus": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "GetPropertyByIdResponse": {
+        "required": [
+          "id",
+          "name",
+          "timeZoneId",
+          "checkInTime",
+          "checkOutTime",
+          "isActive"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "timeZoneId": {
+            "type": "string"
+          },
+          "checkInTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "checkOutTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "GetPropertyUnitsResponse": {
+        "required": [
+          "propertyId",
+          "units"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PropertyRentableUnitResponse"
+            }
+          }
+        }
+      },
+      "InitiatePaymentRequest": {
+        "required": [
+          "bookingId"
+        ],
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "InitiatePaymentResponse": {
+        "required": [
+          "paymentId",
+          "paymentAttemptId",
+          "status",
+          "amount",
+          "currency",
+          "clientSecret"
+        ],
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "paymentAttemptId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "clientSecret": {
+            "type": "string"
+          }
+        }
+      },
+      "PagedResponseOfAdminBookingListItemResponse": {
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalRecords",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminBookingListItemResponse"
+            }
+          },
+          "pageNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalRecords": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "PagedResponseOfPropertyListItemResponse": {
+        "required": [
+          "items",
+          "pageNumber",
+          "pageSize",
+          "totalRecords",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PropertyListItemResponse"
+            }
+          },
+          "pageNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalRecords": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PropertyListItemResponse": {
+        "required": [
+          "id",
+          "name",
+          "isActive"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PropertyRentableUnitResponse": {
+        "required": [
+          "id",
+          "name",
+          "type",
+          "maximumCapacity",
+          "maxBaseGuests",
+          "isEntireProperty"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "maximumCapacity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "maxBaseGuests": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "isEntireProperty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SetPricingSeasonStatusRequest": {
+        "required": [
+          "isActive"
+        ],
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SetPropertyStatusRequest": {
+        "required": [
+          "isActive"
+        ],
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SetRentableUnitStatusRequest": {
+        "required": [
+          "isActive"
+        ],
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdatePricingSeasonRequest": {
+        "required": [
+          "startDate",
+          "endDate",
+          "nightlyRate",
+          "currency",
+          "priority"
+        ],
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "nightlyRate": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "priority": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "UpdatePropertyRequest": {
+        "required": [
+          "name",
+          "timeZoneId",
+          "checkInTime",
+          "checkOutTime"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "timeZoneId": {
+            "type": "string"
+          },
+          "checkInTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "checkOutTime": {
+            "type": "string",
+            "format": "time"
+          }
+        }
+      },
+      "UpdateRentableUnitRequest": {
+        "required": [
+          "name",
+          "type",
+          "maximumCapacity",
+          "maxBaseGuests"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "maximumCapacity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "maxBaseGuests": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "OIDC JWT access token. The server validates the issuer, audience, lifetime and signature.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "BookingGuestToken": {
+        "type": "apiKey",
+        "description": "Opaque credential for accessing an anonymous booking. Issued once in the initial successfulbooking creation response. Store securely. The credential cannot be recovered from the API.",
+        "name": "Booking-Guest-Token",
+        "in": "header"
+      },
+      "StripeSignature": {
+        "type": "apiKey",
+        "description": "Stripe webhook signature. The signature is cryptographically verified against the original request body and configured webhook secret. This is not a JWT or a reusable API token.",
+        "name": "Stripe-Signature",
+        "in": "header"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Bookify.Services.Booking.Api"
+    },
+    {
+      "name": "Properties"
+    },
+    {
+      "name": "Bookings"
+    },
+    {
+      "name": "Payments"
+    },
+    {
+      "name": "Admin RentableUnits"
+    },
+    {
+      "name": "Admin Bookings"
+    }
+  ]
+}
