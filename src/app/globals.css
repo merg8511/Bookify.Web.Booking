@@ -1,4 +1,14 @@
-* {
+/*
+ * MÓDULO 25.2 — GLOBAL STYLES
+ *
+ * Solo estilos universales.
+ * Los estilos de componentes y páginas viven
+ * en sus respectivos CSS Modules.
+ */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -9,48 +19,58 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
-  background: #ffffff;
-  color: #171717;
-  font-family: system-ui, sans-serif;
+
+  background: var(--color-background);
+  color: var(--color-foreground);
+
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.5;
+
+  -webkit-font-smoothing: antialiased;
 }
 
-.foundation {
-  display: grid;
-  min-height: 100vh;
-  align-items: center;
-  padding: clamp(24px, 6vw, 80px);
+button,
+input,
+textarea,
+select {
+  font: inherit;
 }
 
-.foundation__content {
-  width: 100%;
-  max-width: 640px;
-  margin-inline: auto;
+button {
+  cursor: pointer;
 }
 
-.foundation__eyebrow {
-  margin-bottom: 20px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+a {
+  color: inherit;
 }
 
-.foundation h1 {
-  margin: 0;
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 650;
-  line-height: 1.12;
-  letter-spacing: -0.035em;
+img,
+svg {
+  max-width: 100%;
 }
 
-.foundation__description {
-  max-width: 52ch;
-  margin-top: 24px;
-  font-size: 1rem;
-  line-height: 1.75;
+img {
+  height: auto;
 }
 
-.foundation__caption {
-  margin-top: 40px;
-  font-size: 0.875rem;
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/*
+ * Accesibilidad:
+ * reducir animaciones y transiciones cuando
+ * el usuario así lo solicite en su sistema.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
