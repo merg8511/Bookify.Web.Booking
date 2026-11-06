@@ -13,7 +13,9 @@
     "api:check": "openapi-typescript contracts/booking-v1.openapi.json -o src/lib/api/generated/booking-v1.d.ts --check"
   },
   "dependencies": {
+    "jose": "6.2.15",
     "next": "16.4.5",
+    "next-auth": "5.0.0-beta.32",
     "openapi-fetch": "0.17.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
