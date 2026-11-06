@@ -179,3 +179,29 @@ pnpm api:validate
 pnpm api:generate
 pnpm api:check
 ```
+
+## Modelo unificado de errores
+
+Bookify utiliza un modelo compartido para interpretar
+respuestas Problem Details, errores HTTP y fallos
+de conexión.
+
+Archivos principales:
+
+- `src/lib/api/errors/bookify-api-error.ts`
+- `src/lib/api/errors/normalize-api-error.ts`
+- `src/lib/api/errors/execute-api-request.ts`
+
+Componente visual:
+
+`src/components/ui/api-error-notice.tsx`
+
+Documentación:
+
+`docs/architecture/api-errors.md`
+
+Los errores se normalizan antes de presentarse.
+El modelo conserva los códigos semánticos y
+respeta la información de Retry-After cuando existe.
+
+No se ejecutan reintentos automáticos.
