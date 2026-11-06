@@ -1,0 +1,88 @@
+/*
+ * MÓDULO 25.4 — ERROR NOTICE
+ *
+ * Utiliza los tokens semánticos de 25.2.
+ * No introduce colores de marca definitivos.
+ */
+
+.notice {
+  width: 100%;
+  min-width: 0;
+
+  padding: var(--space-5);
+
+  border: 1px solid currentColor;
+  border-radius: var(--radius-lg);
+}
+
+.content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.destructive {
+  background: var(--color-destructive-surface);
+  color: var(--color-destructive);
+}
+
+.warning {
+  background: var(--color-warning-surface);
+  color: var(--color-warning);
+}
+
+.title {
+  margin: 0;
+
+  font-size: var(--text-base);
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.detail {
+  margin: 0;
+
+  font-size: var(--text-sm);
+  line-height: 1.65;
+
+  overflow-wrap: anywhere;
+}
+
+.retryAfter {
+  margin: 0;
+
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.diagnostics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  padding-top: var(--space-3);
+
+  border-top: 1px solid currentColor;
+
+  font-size: var(--text-xs);
+  line-height: 1.6;
+
+  opacity: 0.85;
+}
+
+.diagnostics p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.diagnostics code {
+  font-family: ui-monospace, monospace;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  .notice {
+    padding: var(--space-4);
+  }
+}
