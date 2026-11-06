@@ -1,0 +1,94 @@
+/*
+ * MÓDULO 25.5 — AUTH LAYOUT STYLES
+ *
+ * Reutilizamos el sistema de tokens de 25.2.
+ * Los valores de marca siguen siendo provisionales.
+ */
+
+.screen {
+  display: grid;
+  min-height: 100svh;
+  align-items: center;
+  padding-block: var(--space-12);
+}
+
+.panel {
+  display: flex;
+  width: 100%;
+  max-width: 34rem;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-inline: auto;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-foreground-muted);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.description {
+  margin: 0;
+  color: var(--color-foreground-muted);
+  font-size: var(--text-base);
+  line-height: 1.7;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.details dt {
+  color: var(--color-foreground-muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.details dd {
+  margin: 0;
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.actionForm {
+  margin: 0;
+}
+
+.note {
+  margin: 0;
+  color: var(--color-foreground-muted);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .screen {
+    padding-block: var(--space-8);
+  }
+
+  .actions {
+    align-items: stretch;
+  }
+}
