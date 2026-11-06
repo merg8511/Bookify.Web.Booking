@@ -205,3 +205,64 @@ El modelo conserva los códigos semánticos y
 respeta la información de Retry-After cuando existe.
 
 No se ejecutan reintentos automáticos.
+
+## Autenticación OIDC
+
+El frontend utiliza Auth.js para iniciar sesión
+mediante un proveedor OpenID Connect externo.
+
+La API Bookify sigue siendo responsable de
+validar los JWT y autorizar el acceso a los
+recursos.
+
+### Configuración local
+
+Crear o actualizar `.env.local` a partir de
+`.env.example`.
+
+Configurar:
+
+- `BOOKIFY_OIDC_ISSUER`
+- `BOOKIFY_API_AUDIENCE`
+- `AUTH_BOOKIFY_ID`
+- `AUTH_BOOKIFY_SECRET`
+- `AUTH_SECRET`
+
+La audiencia debe coincidir con la configurada
+en el backend Bookify.
+
+Registrar en el proveedor OIDC el callback:
+
+`http://localhost:3000/api/auth/callback/bookify-oidc`
+
+El proveedor debe emitir access tokens con
+`sub`, audiencia correcta y roles Bookify
+en el claim `roles`.
+
+### Rutas
+
+- `/login` — Inicio de sesión OIDC
+- `/account` — Sesión autenticada
+- `/admin` — Acceso Admin o Owner
+- `/access-denied` — Acceso restringido
+
+### Seguridad
+
+La sesión se almacena mediante Auth.js en
+una cookie cifrada y HttpOnly.
+
+Los access tokens no se exponen en el JSON
+público de sesión.
+
+La autorización por recurso permanece en el
+backend.
+
+No existen reintentos automáticos ni renovación
+silenciosa de access tokens.
+
+Al vencer el access token debe iniciarse
+una nueva autenticación.
+
+### Documentación
+
+`docs/architecture/authentication.md`
