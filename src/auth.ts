@@ -37,7 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           const identity = await verifyBookifyApiToken(account.access_token);
 
-          if (token.sub && token.sub !== identity.subject) {
+          if (account.providerAccountId !== identity.subject) {
             throw new Error("OIDC subject does not match Bookify API subject.");
           }
 

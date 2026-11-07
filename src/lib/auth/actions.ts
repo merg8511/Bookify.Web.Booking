@@ -4,7 +4,7 @@ import { signIn, signOut } from "@/auth";
 
 export async function signInWithBookify() {
   await signIn("bookify-oidc", {
-    redirectTo: "account",
+    redirectTo: "/account",
   });
 }
 
