@@ -310,3 +310,73 @@ implementación del flujo público de reservas.
 ### Documentación
 
 `docs/architecture/guest-booking-credential.md`
+
+## Testing frontend
+
+La suite del Módulo 25 utiliza Vitest,
+React Testing Library y Playwright.
+
+### Tests unitarios y de componentes
+
+```powershell
+pnpm test:unit
+```
+
+Modo interactivo:
+
+```powershell
+pnpm test:watch
+```
+
+Cobertura:
+
+```powershell
+pnpm test:coverage
+```
+
+El reporte HTML se genera en:
+
+`coverage/index.html`
+
+### Tests E2E
+
+Compilar primero:
+
+```powershell
+pnpm build
+```
+
+Ejecutar Chromium:
+
+```powershell
+pnpm test:e2e
+```
+
+Interfaz de Playwright:
+
+```powershell
+pnpm test:e2e:ui
+```
+
+### Regresión completa
+
+```powershell
+pnpm test:all
+```
+
+### CI
+
+Workflow:
+
+`.github/workflows/frontend-ci.yml`
+
+La configuración de CI usa credenciales sintéticas
+y verifica rutas anónimas.
+
+No reemplaza la autenticación real contra
+el proveedor OIDC ni las pruebas E2E de
+los módulos funcionales posteriores.
+
+### Documentación
+
+`docs/testing/module-25-final-verification.md`
