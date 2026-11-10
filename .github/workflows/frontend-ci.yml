@@ -1,0 +1,135 @@
+name: Bookify Frontend CI
+
+on:
+  push:
+    branches:
+      - feature/nextjs-frontend-foundations
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+# MÓDULO 25.7:
+# Permisos mínimos de solo lectura.
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: Frontend quality and regression
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 25
+
+    env:
+      CI: "true"
+
+      # Configuración de build y pruebas anónimas.
+      # No existe un proveedor OIDC real detrás
+      # de este dominio de ejemplo.
+      BOOKIFY_API_BASE_URL: https://localhost:7071
+
+      BOOKIFY_OIDC_ISSUER: >-
+        https://identity.example.invalid/realms/bookify
+
+      BOOKIFY_API_AUDIENCE: bookify-booking-api
+
+      AUTH_BOOKIFY_ID: bookify-ci-client
+      AUTH_BOOKIFY_SECRET: synthetic-ci-only
+
+      # AUTH_TRUST_HOST se permite aquí porque
+      # el servidor E2E escucha exclusivamente
+      # en 127.0.0.1 dentro del runner.
+      #
+      # No copiar esta configuración como
+      # política de producción.
+      AUTH_TRUST_HOST: "true"
+      AUTH_URL: http://127.0.0.1:3100
+
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.1
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      # CAMBIO 25.7:
+      # Generamos claves efímeras exclusivamente
+      # para el proceso CI.
+      #
+      # No imprimimos los valores ni los
+      # almacenamos como artefactos.
+      - name: Prepare synthetic CI secrets
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require("node:fs");
+          const crypto = require("node:crypto");
+
+          const values = [
+            ["AUTH_SECRET", crypto.randomBytes(32)],
+            ["BOOKIFY_GUEST_COOKIE_KEY", crypto.randomBytes(32)]
+          ];
+
+          const lines = values.map(
+            ([name, value]) =>
+              `${name}=${value.toString("base64")}`
+          );
+
+          fs.appendFileSync(
+            process.env.GITHUB_ENV,
+            lines.join("\n") + "\n"
+          );
+          NODE
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate OpenAPI contract
+        run: |
+          pnpm api:validate
+          pnpm api:check
+
+      - name: ESLint
+        run: pnpm lint
+
+      - name: TypeScript
+        run: pnpm typecheck
+
+      - name: Unit and component tests
+        run: pnpm test:coverage
+
+      - name: Build Next.js
+        run: pnpm build
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Playwright regression
+        run: pnpm test:e2e
+
+      # El conjunto actual contiene únicamente
+      # pruebas anónimas. No subir trazas de
+      # sesiones autenticadas ni datos personales.
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-reports
+          path: |
+            coverage/
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
