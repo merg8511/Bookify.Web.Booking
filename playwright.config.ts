@@ -55,17 +55,17 @@ export default defineConfig({
 
     url: baseURL,
 
-    /*
-     * CAMBIO 25.7:
-     * No reutilizamos un servidor existente,
-     * para evitar probar por accidente otra
-     * versión de Bookify en el mismo puerto.
-     */
     reuseExistingServer: false,
 
     timeout: 120_000,
 
     stdout: "ignore",
     stderr: "pipe",
+
+    // Solo para el servidor local de pruebas E2E.
+    env: {
+      ...process.env,
+      AUTH_TRUST_HOST: "true",
+    },
   },
 });
