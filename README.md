@@ -266,3 +266,47 @@ una nueva autenticación.
 ### Documentación
 
 `docs/architecture/authentication.md`
+
+## Acceso a reservas anónimas
+
+Bookify permite acceder a una reserva Guest
+mediante una credencial emitida por el backend.
+
+El token se recibe exclusivamente en el header
+`Booking-Guest-Token` de la creación inicial.
+
+La infraestructura frontend utiliza:
+
+- `src/lib/auth/guest-credential-crypto.ts`
+- `src/lib/auth/guest-credential-store.ts`
+- `src/lib/auth/guest-api-access.ts`
+
+Las credenciales se conservan cifradas en
+cookies HttpOnly y no forman parte de la
+sesión OIDC.
+
+### Configuración
+
+Agregar a `.env.local`:
+
+`BOOKIFY_GUEST_COOKIE_KEY`
+
+Utilizar una clave aleatoria de 32 bytes
+codificados en Base64 estándar.
+
+No reutilizar `AUTH_SECRET`.
+
+### Limitaciones
+
+La credencial Guest no puede recuperarse
+desde el backend si se pierde.
+
+Su captura real durante la creación de
+reservas pertenece al módulo 26.6.
+
+La gestión del token no constituye una
+implementación del flujo público de reservas.
+
+### Documentación
+
+`docs/architecture/guest-booking-credential.md`
