@@ -84,12 +84,25 @@ export function parseRetryAfter(
 
   const trimmed = value.trim();
 
+  if (trimmed.length === 0) {
+    return null;
+  }
+
+  // Retry-After expresado en segundos.
+  // Solo se permiten enteros decimales no negativos.
   if (/^\d+$/.test(trimmed)) {
     const seconds = Number(trimmed);
 
     return Number.isSafeInteger(seconds) ? seconds : null;
   }
 
+  // Impedir que Date.parse interprete valores
+  // numéricos inválidos como fechas.
+  if (/^[+-]?\d/.test(trimmed)) {
+    return null;
+  }
+
+  // Retry-After expresado como fecha.
   const dateMilliseconds = Date.parse(trimmed);
 
   if (!Number.isFinite(dateMilliseconds)) {
