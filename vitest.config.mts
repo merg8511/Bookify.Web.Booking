@@ -58,6 +58,7 @@ export default defineConfig({
         "src/lib/auth/guest-credential-store.ts",
         "src/lib/auth/guest-api-access.ts",
         "src/components/ui/**/*.tsx",
+        "src/lib/auth/verify-api-token.ts",
       ],
 
       exclude: ["**/*.d.ts", "**/generated/**", "**/*.module.css"],
