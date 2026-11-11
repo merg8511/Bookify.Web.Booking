@@ -6,7 +6,7 @@ import styles from "./page.module.css";
 
 export default function HomePage() {
   return (
-    <main className={styles.page}>
+    <main id="contenido-principal" tabIndex={-1} className={styles.page}>
       <ContentContainer>
         <div className={styles.content}>
           <header className={styles.hero}>

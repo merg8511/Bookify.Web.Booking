@@ -1,13 +1,21 @@
 import type { ReactNode } from "react";
 import { EB_Garamond, Cabin } from "next/font/google";
+
+import { PublicHeader } from "@/components/navigation/public-header";
+
 import "@/styles/public-tokens.css";
 
 /*
- * MÓDULO 26.1 — PUBLIC LAYOUT
+ * BOOKIFY — PUBLIC LAYOUT
  *
- * TIP-001: fuentes públicas aprobadas.
- * DS-003: separación visual público/admin.
+ * TIP-001: EB Garamond + Cabin.
+ * NAV-001: Editorial Header NAV-P1.
+ * RESP-001: Editorial Continuity.
+ *
+ * El layout conserva la identidad pública
+ * sin introducir lógica de reservas.
  */
+
 const displayFont = EB_Garamond({
   subsets: ["latin"],
   variable: "--font-public-display",
@@ -30,6 +38,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       data-bookify-ui="public"
       className={`${displayFont.variable} ${bodyFont.variable}`}
     >
+      <PublicHeader />
+
       {children}
     </div>
   );

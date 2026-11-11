@@ -19,6 +19,7 @@
     "test:all": "pnpm lint && pnpm typecheck && pnpm api:validate && pnpm api:check && pnpm test:coverage && pnpm build && pnpm test:e2e"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "jose": "6.2.15",
     "next": "16.4.5",
     "next-auth": "5.0.0-beta.32",

@@ -1,0 +1,265 @@
+/*
+ * BOOKIFY — NAV-P1 EDITORIAL HEADER
+ *
+ * COLOR-001: Olive & Ivory
+ * GEOM-001: Editorial Airy
+ * RESP-001: Editorial Continuity
+ * MOTION-001: Quiet Elegance
+ */
+
+.header {
+  position: relative;
+  width: 100%;
+
+  border-bottom: 1px solid var(--color-border);
+
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+/* Acceso directo al contenido */
+
+.skipLink {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-4);
+  z-index: 10;
+
+  padding: var(--space-3) var(--space-4);
+
+  border-radius: var(--radius-button);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+
+  transform: translateY(-160%);
+}
+
+.skipLink:focus-visible {
+  transform: translateY(0);
+
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* Estructura desktop */
+
+.bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--space-8);
+
+  min-height: 80px;
+
+  /*
+   * H nominal de 40 px.
+   * Zona libre vertical >= 0.5H = 20 px.
+   */
+  padding-block: var(--space-5);
+}
+
+/* El SVG es el maestro Horizon, no HTML recreado */
+
+.brand {
+  --bookify-brand-height: 40px;
+  --bookify-brand-mobile-height: 30px;
+
+  justify-self: start;
+}
+
+/* Navegación central */
+
+.desktopNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+}
+
+.navLink,
+.staffLink {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+
+  border-bottom: 1px solid transparent;
+
+  color: var(--color-foreground);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.4;
+
+  text-decoration: none;
+
+  transition:
+    color var(--motion-fast) var(--motion-easing),
+    border-color var(--motion-fast) var(--motion-easing);
+}
+
+.navLink[aria-current="page"] {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Acceso real, no CTA de reserva */
+
+.staffLink {
+  justify-self: end;
+  color: var(--color-primary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .navLink:hover,
+  .staffLink:hover {
+    border-bottom-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+}
+
+/* Control móvil: oculto en escritorio */
+
+.menuButton {
+  display: none;
+
+  width: 44px;
+  height: 44px;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+
+  background: var(--color-surface);
+  color: var(--color-primary);
+
+  cursor: pointer;
+
+  transition:
+    background-color var(--motion-fast) var(--motion-easing),
+    border-color var(--motion-fast) var(--motion-easing);
+}
+
+.menuButton:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .menuButton:hover {
+    border-color: var(--color-primary);
+    background: var(--color-background-alt);
+  }
+}
+
+/* El panel nunca se muestra en escritorio */
+
+.mobileNav,
+.mobileNav[hidden] {
+  display: none;
+}
+
+.mobileLink {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+
+  padding: var(--space-3) var(--space-4);
+
+  border-radius: var(--radius-button);
+
+  color: var(--color-foreground);
+  font-size: var(--text-base);
+  font-weight: 500;
+  text-decoration: none;
+
+  transition: background-color var(--motion-fast) var(--motion-easing);
+}
+
+.mobileLink[aria-current="page"] {
+  background: var(--color-background-alt);
+  color: var(--color-primary);
+
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mobileLink:hover {
+    background: var(--color-background-alt);
+  }
+}
+
+/* Responsive — el cambio responde al espacio
+   disponible, no a un modelo de dispositivo. */
+
+@media (max-width: 860px) {
+  .bar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-4);
+
+    min-height: 68px;
+    padding-block: var(--space-3);
+  }
+
+  /*
+   * H = 30 px; el botón de 44 px centra la marca.
+   * Margen vertical efectivo >= 0.5H.
+   */
+
+  .desktopNav,
+  .staffLink {
+    display: none;
+  }
+
+  .menuButton {
+    display: inline-flex;
+    justify-self: end;
+  }
+
+  .mobileNav:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+
+    padding-block: var(--space-2) var(--space-4);
+
+    border-top: 1px solid var(--color-border);
+
+    animation: editorial-menu-reveal var(--motion-editorial-reveal, 380ms)
+      ease-out both;
+  }
+}
+
+@keyframes editorial-menu-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileNav:not([hidden]) {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .menuButton {
+    border-color: ButtonText;
+  }
+
+  .mobileLink[aria-current="page"] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}

@@ -83,7 +83,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     }
 
     return (
-      <main className={styles.page}>
+      <main id="contenido-principal" tabIndex={-1} className={styles.page}>
         <ContentContainer>
           <div className={styles.errorContent}>
             <ApiErrorNotice error={result.error} />
@@ -106,7 +106,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
   if (!property) {
     return (
-      <main className={styles.page}>
+      <main id="contenido-principal" tabIndex={-1} className={styles.page}>
         <ContentContainer>
           <p role="alert">
             No fue posible obtener la información del alojamiento.
@@ -117,7 +117,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
   }
 
   return (
-    <main className={styles.page}>
+    <main id="contenido-principal" tabIndex={-1} className={styles.page}>
       <ContentContainer>
         <div className={styles.content}>
           <header className={styles.hero}>

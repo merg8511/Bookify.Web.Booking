@@ -10,7 +10,7 @@ import styles from "./page.module.css";
 
 export default function PropertyNotFound() {
   return (
-    <main className={styles.page}>
+    <main id="contenido-principal" tabIndex={-1} className={styles.page}>
       <ContentContainer>
         <div className={styles.errorContent}>
           <p className={styles.eyebrow}>Alojamiento no encontrado</p>
