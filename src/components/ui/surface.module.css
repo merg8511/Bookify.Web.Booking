@@ -1,10 +1,24 @@
+/*
+ * BOOKIFY — SURFACE
+ * C1: tarjetas editoriales amplias.
+ * C2: paneles profesionales compactos.
+ */
+
 .surface {
   min-width: 0;
   padding: var(--space-6);
 
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-card, var(--radius-lg));
 
-  background: var(--color-surface-raised);
-  box-shadow: var(--shadow-subtle);
+  background: var(--color-surface);
+  color: var(--color-foreground);
+
+  box-shadow: none;
+}
+
+/* Panel administrativo: mayor densidad */
+
+[data-bookify-ui="admin"] .surface {
+  padding: var(--space-4);
 }

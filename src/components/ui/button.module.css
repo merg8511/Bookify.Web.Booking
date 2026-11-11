@@ -1,55 +1,110 @@
+/*
+ * BOOKIFY — BUTTON
+ * COMP-001 / COMP-002
+ * Identidad visual mediante tokens por scope.
+ */
+
 .button {
   display: inline-flex;
+  min-width: 0;
   min-height: var(--control-min-height);
-
   align-items: center;
   justify-content: center;
-
   gap: var(--space-2);
-  padding-inline: var(--space-5);
+
+  padding: var(--space-2) var(--space-5);
 
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-button, var(--radius-md));
 
-  font-family: inherit;
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.35;
   text-align: center;
   text-decoration: none;
 
+  white-space: normal;
+
   transition:
     background-color var(--motion-fast) var(--motion-easing),
-    border-color var(--motion-fast) var(--motion-easing);
+    border-color var(--motion-fast) var(--motion-easing),
+    box-shadow var(--motion-fast) var(--motion-easing);
 }
 
+/* Acción principal */
+
 .primary {
+  border-color: var(--color-primary);
   background: var(--color-primary);
   color: var(--color-on-primary);
 }
 
+/* Acción secundaria */
+
 .secondary {
-  border-color: var(--color-border);
-  background: var(--color-surface-raised);
+  border-color: var(--color-foreground-muted);
+  border-color: color-mix(
+    in srgb,
+    var(--color-border) 40%,
+    var(--color-foreground-muted) 60%
+  );
+
+  background: var(--color-surface);
   color: var(--color-foreground);
 }
+
+/* Foco visible y accesible */
 
 .button:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 3px;
 }
 
+/* Estado deshabilitado */
+
 button.button:disabled {
-  opacity: 0.55;
+  opacity: 0.65;
   cursor: not-allowed;
 }
+
+/* Estado loading: el componente deshabilita el botón */
+
+button.button[aria-busy="true"] {
+  cursor: progress;
+}
+
+/* Interacciones compatibles con puntero */
 
 @media (hover: hover) and (pointer: fine) {
   .primary:hover {
     background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
   }
 
   .secondary:hover {
-    background: var(--color-surface);
+    background: var(--color-background-alt);
+    border-color: var(--color-foreground-muted);
   }
+}
+
+.primary:active {
+  background: var(--color-primary-hover);
+}
+
+.secondary:active {
+  background: var(--color-background-alt);
+}
+
+/* C1 — Editorial Hospitality */
+
+[data-bookify-ui="public"] .button {
+  font-size: var(--text-base);
+}
+
+/* C2 — Concierge Admin */
+
+[data-bookify-ui="admin"] .button {
+  padding-inline: var(--space-4);
+  font-size: var(--text-sm);
 }

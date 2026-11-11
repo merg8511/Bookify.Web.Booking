@@ -1,6 +1,22 @@
+/*
+ * BOOKIFY — CONTENT CONTAINER
+ *
+ * Público: composición editorial hasta 1280px.
+ * Administración: workspace fluido.
+ */
+
 .container {
   width: 100%;
+  min-width: 0;
+
   max-width: var(--layout-max-width);
   margin-inline: auto;
-  padding-inline: clamp(1rem, 4vw, 2.5rem);
+
+  padding-inline: clamp(var(--space-4), 4vw, var(--space-10));
+}
+
+/* Administración: gutters más eficientes */
+
+[data-bookify-ui="admin"] .container {
+  padding-inline: clamp(var(--space-4), 2.5vw, var(--space-8));
 }
