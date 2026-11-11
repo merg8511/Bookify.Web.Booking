@@ -62,14 +62,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
-          cache: pnpm
+          cache:
+            pnpm
 
-      # CAMBIO 25.7:
-      # Generamos claves efímeras exclusivamente
-      # para el proceso CI.
-      #
-      # No imprimimos los valores ni los
-      # almacenamos como artefactos.
+            # MÓDULO 25 — Seguridad de CI:
+      # Las claves sintéticas se regeneran en cada run.
+      # Se enmascaran antes de exportarlas al entorno.
       - name: Prepare synthetic CI secrets
         shell: bash
         run: |
@@ -82,15 +80,18 @@ jobs:
             ["BOOKIFY_GUEST_COOKIE_KEY", crypto.randomBytes(32)]
           ];
 
-          const lines = values.map(
-            ([name, value]) =>
-              `${name}=${value.toString("base64")}`
-          );
+          for (const [name, bytes] of values) {
+            const value = bytes.toString("base64");
 
-          fs.appendFileSync(
-            process.env.GITHUB_ENV,
-            lines.join("\n") + "\n"
-          );
+            // Evita que el valor aparezca en logs
+            // posteriores de GitHub Actions.
+            process.stdout.write(`::add-mask::${value}\n`);
+
+            fs.appendFileSync(
+              process.env.GITHUB_ENV,
+              `${name}=${value}\n`
+            );
+          }
           NODE
 
       - name: Install dependencies
