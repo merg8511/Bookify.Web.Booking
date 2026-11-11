@@ -1,0 +1,57 @@
+/*
+ * BOOKIFY — HORIZON LOGO
+ *
+ * LOGO-003: LOCK-2 está incluido
+ * en el SVG maestro.
+ *
+ * LOGO-004: Z-2 debe respetarse
+ * en el layout que contenga el logo.
+ */
+
+.logo {
+  display: inline-flex;
+  max-width: 100%;
+  flex-shrink: 0;
+
+  align-items: center;
+  justify-content: flex-start;
+
+  line-height: 0;
+  text-decoration: none;
+}
+
+.image {
+  display: block;
+
+  width: auto;
+  height: var(--bookify-brand-height, 52px);
+
+  max-width: 100%;
+
+  object-fit: contain;
+}
+
+/* Accesibilidad de logo enlazado */
+
+.logo:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 4px;
+
+  border-radius: 4px;
+}
+
+/* Altura adaptable a dispositivos pequeños */
+
+@media (max-width: 767px) {
+  .image {
+    height: var(--bookify-brand-mobile-height, 40px);
+  }
+}
+
+/* Alto contraste */
+
+@media (forced-colors: active) {
+  .logo:focus-visible {
+    outline-color: Highlight;
+  }
+}
