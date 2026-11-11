@@ -1,0 +1,56 @@
+/*
+ * MÓDULO 26.1 — PUBLIC DESIGN TOKENS
+ *
+ * COLOR-001: Olive & Ivory.
+ * GEOM-001: Editorial Airy.
+ *
+ * Se aplican exclusivamente al scope público.
+ */
+
+[data-bookify-ui="public"] {
+  min-height: 100svh;
+
+  /* Colores aprobados P1 */
+  --color-background: #f8f4ee;
+  --color-background-alt: #f1ebe2;
+  --color-surface: #fffdf9;
+  --color-surface-raised: #fffdf9;
+
+  --color-foreground: #22261f;
+  --color-foreground-muted: #5c6257;
+
+  --color-primary: #46502e;
+  --color-primary-hover: #394325;
+  --color-on-primary: #ffffff;
+
+  --color-accent: #b9a080;
+  --color-border: #d7d0c5;
+
+  /* Estados semánticos públicos */
+  --color-success: #216246;
+  --color-success-surface: #e9f5ed;
+
+  --color-warning: #8d4c1f;
+  --color-warning-surface: #fff3df;
+
+  --color-destructive: #a12828;
+  --color-destructive-surface: #fff0ee;
+
+  --color-info: #385b87;
+  --color-info-surface: #edf4fa;
+
+  /* TIP-001 */
+  --font-body: var(--font-public-body), sans-serif;
+
+  /* GEOM-001 */
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --control-min-height: 48px;
+  --layout-max-width: 80rem;
+
+  background: var(--color-background);
+  color: var(--color-foreground);
+
+  font-family: var(--font-body);
+}
