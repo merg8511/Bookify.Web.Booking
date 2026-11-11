@@ -1,17 +1,32 @@
 # Bookify Web Booking
 
-Frontend Next.js para la plataforma Bookify.
+Frontend Next.js de la plataforma Bookify.
 
 ## Estado del proyecto
 
 Módulo 25 — Fundamentos de Next.js.
 
-- 25.1 Proyecto: scaffold inicial existente.
-- 25.2 Arquitectura: implementación en curso.
-- 25.3–25.7: pendientes.
+Implementación completada en la branch:
 
-Este repositorio no implementa todavía el
-flujo completo de reservas.
+`feature/nextjs-frontend-foundations`
+
+Submódulos implementados:
+
+- 25.1 — Proyecto
+- 25.2 — Arquitectura
+- 25.3 — API client
+- 25.4 — Problem Details
+- 25.5 — Authentication
+- 25.6 — Guest booking credential
+- 25.7 — Testing frontend
+
+Regresión local y CI de la branch verificados.
+
+La integración definitiva en main requiere
+revisión y merge del Pull Request.
+
+El frontend aún no implementa los recorridos
+funcionales de reservas, administración o pagos.
 
 ## Stack
 
@@ -22,6 +37,13 @@ flujo completo de reservas.
 - CSS Modules
 - CSS Custom Properties
 - pnpm 10.28.1
+- openapi-typescript
+- openapi-fetch
+- Auth.js / NextAuth
+- jose
+- Vitest
+- React Testing Library
+- Playwright
 
 ## Repositorios
 
@@ -34,16 +56,13 @@ Backend:
 https://github.com/merg8511/Bookify.Services.Booking
 
 El backend es una API .NET 10 con PostgreSQL,
-Clean Architecture y endpoints `/api/v1`.
+Clean Architecture y endpoints bajo `/api/v1`.
 
 ## Requisitos
 
-- Node.js compatible con la versión de Next.js
+- Node.js 24 actualizado, recomendado para CI
 - pnpm 10.28.1
 - Git
-
-La versión de pnpm está indicada en el campo
-`packageManager` de `package.json`.
 
 ## Instalación
 
@@ -51,22 +70,22 @@ La versión de pnpm está indicada en el campo
 pnpm install --frozen-lockfile
 ```
 
-Crear el archivo de configuración local:
+Crear la configuración local:
 
 ```powershell
 Copy-Item .env.example .env.local
 ```
 
-Contenido de ejemplo:
+No versionar `.env.local`.
+
+La aplicación necesita un origen HTTP/HTTPS
+válido en `BOOKIFY_API_BASE_URL`.
+
+Ejemplo de desarrollo:
 
 ```dotenv
 BOOKIFY_API_BASE_URL=https://localhost:7071
 ```
-
-La URL corresponde al perfil HTTPS local
-del backend Bookify.
-
-No versionar `.env.local`, credenciales ni tokens.
 
 ## Desarrollo
 
@@ -78,119 +97,115 @@ Abrir:
 
 http://localhost:3000
 
-## Verificación
-
-```powershell
-pnpm lint
-pnpm typecheck
-pnpm build
-```
-
-Para ejecutar el build:
-
-```powershell
-pnpm start
-```
-
 ## Arquitectura
 
-La documentación arquitectónica se encuentra en:
+Documentación:
 
 `docs/architecture/frontend-architecture.md`
 
-### Organización
+Organización:
 
-`src/app`
+- `src/app`: App Router, layouts y páginas.
+- `src/components/ui`: componentes visuales.
+- `src/styles`: tokens y estilos.
+- `src/lib/api`: cliente y errores HTTP.
+- `src/lib/auth`: sesiones y credenciales.
+- `src/features`: funcionalidades futuras cuando
+  sus módulos correspondientes comiencen.
 
-App Router, layouts y páginas.
-
-`src/components/ui`
-
-Componentes visuales compartidos.
-
-`src/styles`
-
-Tokens y fundamentos globales.
-
-`src/features`
-
-Funcionalidades de negocio cuando sus módulos
-correspondientes sean implementados.
-
-`src/lib/api`
-
-Cliente OpenAPI tipado a partir de 25.3.
-
-Los directorios futuros se crearán al contener
-código real, sin scaffolding vacío.
+No crear scaffolding vacío sin un uso concreto.
 
 ## Design System
 
-La base visual utiliza CSS Modules y tokens
-semánticos.
+La identidad visual aprobada de Bookify establece:
 
-Los colores y la tipografía actuales son
-provisionales. No representan una identidad
-de marca aprobada.
+**Experiencia pública:**
+Editorial Hospitality P1,
+Olive & Ivory,
+EB Garamond + Cabin.
 
-La experiencia final debe ser profesional,
-minimalista, coherente, accesible y responsive.
+**Experiencia administrativa:**
+Concierge Admin A2,
+Ice & Navy,
+Inter.
+
+**Marca:**
+Horizon L2.3 y wordmark `bookify.`.
+
+Las referencias de diseño representan direcciones
+visuales aprobadas, no contratos funcionales.
+
+El frontend actual conserva tokens y componentes
+fundacionales provisionales.
+
+La integración visual completa de P1 y A2,
+sus activos maestros y el QA de navegador
+deben realizarse dentro de los módulos
+funcionales correspondientes.
+
+No inventar funcionalidades a partir de mockups.
 
 ## Backend y seguridad
 
-El backend proporciona las operaciones,
-contratos y reglas autoritativas.
-
-La UI no debe inventar:
+El backend es autoritativo para:
 
 - Disponibilidad
 - Precios
-- Estados de reservas
-- Estados de pagos
-- Permisos
+- Reservas
+- Pagos
+- Roles
+- Ownership
+- Transiciones de estado
 
-OIDC y Guest booking credentials se integrarán
-en sus submódulos respectivos.
+La UI no marca una reserva como Paid por sí misma.
 
-Los tokens y secretos nunca deben exponerse
-en logs, URLs ni assets públicos.
+Los tokens y secretos no deben exponerse
+en logs, URLs, analytics o assets públicos.
 
-## Pruebas
+## API tipada
 
-La cobertura consolidada del Módulo 25
-corresponde a 25.7 — Testing frontend.
-
-Los pasos de verificación técnica de 25.2
-se ejecutan localmente antes de su cierre.
-
-## Cliente API tipado
-
-El cliente HTTP utiliza `openapi-fetch` y tipos
-generados mediante `openapi-typescript`.
-
-El contrato OpenAPI del backend se conserva en:
+Contrato versionado:
 
 `contracts/booking-v1.openapi.json`
 
-Generación y verificación:
+Tipos generados:
+
+`src/lib/api/generated/booking-v1.d.ts`
+
+Cliente HTTP:
+
+`src/lib/api/server-client.ts`
+
+Verificación:
 
 ```powershell
 pnpm api:validate
-pnpm api:generate
 pnpm api:check
 ```
 
-## Modelo unificado de errores
+Generación:
 
-Bookify utiliza un modelo compartido para interpretar
-respuestas Problem Details, errores HTTP y fallos
-de conexión.
+```powershell
+pnpm api:generate
+```
 
-Archivos principales:
+Documentación:
 
-- `src/lib/api/errors/bookify-api-error.ts`
-- `src/lib/api/errors/normalize-api-error.ts`
-- `src/lib/api/errors/execute-api-request.ts`
+`docs/architecture/api-client.md`
+
+## Problem Details
+
+El modelo unificado maneja:
+
+- Errores HTTP
+- Problem Details
+- Errores de transporte
+- Cancelaciones
+- Retry-After
+
+Archivos:
+
+`src/lib/api/errors/`
 
 Componente visual:
 
@@ -200,132 +215,84 @@ Documentación:
 
 `docs/architecture/api-errors.md`
 
-Los errores se normalizan antes de presentarse.
-El modelo conserva los códigos semánticos y
-respeta la información de Retry-After cuando existe.
-
-No se ejecutan reintentos automáticos.
+No se implementan reintentos automáticos
+para operaciones sensibles.
 
 ## Autenticación OIDC
 
-El frontend utiliza Auth.js para iniciar sesión
-mediante un proveedor OpenID Connect externo.
+El frontend integra Auth.js y consume
+access tokens del proveedor OIDC.
 
-La API Bookify sigue siendo responsable de
-validar los JWT y autorizar el acceso a los
-recursos.
+Variables principales:
 
-### Configuración local
+- BOOKIFY_OIDC_ISSUER
+- BOOKIFY_API_AUDIENCE
+- AUTH_BOOKIFY_ID
+- AUTH_BOOKIFY_SECRET
+- AUTH_SECRET
 
-Crear o actualizar `.env.local` a partir de
-`.env.example`.
-
-Configurar:
-
-- `BOOKIFY_OIDC_ISSUER`
-- `BOOKIFY_API_AUDIENCE`
-- `AUTH_BOOKIFY_ID`
-- `AUTH_BOOKIFY_SECRET`
-- `AUTH_SECRET`
-
-La audiencia debe coincidir con la configurada
-en el backend Bookify.
-
-Registrar en el proveedor OIDC el callback:
+Callback local:
 
 `http://localhost:3000/api/auth/callback/bookify-oidc`
 
-El proveedor debe emitir access tokens con
-`sub`, audiencia correcta y roles Bookify
-en el claim `roles`.
+Rutas:
 
-### Rutas
+- `/login`
+- `/account`
+- `/admin`
+- `/access-denied`
 
-- `/login` — Inicio de sesión OIDC
-- `/account` — Sesión autenticada
-- `/admin` — Acceso Admin o Owner
-- `/access-denied` — Acceso restringido
+Los roles reconocidos son:
 
-### Seguridad
+- Admin
+- Owner
+- Customer
 
-La sesión se almacena mediante Auth.js en
-una cookie cifrada y HttpOnly.
+La autorización definitiva pertenece al backend.
 
-Los access tokens no se exponen en el JSON
-público de sesión.
+La sesión pública no debe incluir access tokens.
 
-La autorización por recurso permanece en el
-backend.
-
-No existen reintentos automáticos ni renovación
-silenciosa de access tokens.
-
-Al vencer el access token debe iniciarse
-una nueva autenticación.
-
-### Documentación
+Documentación:
 
 `docs/architecture/authentication.md`
 
-## Acceso a reservas anónimas
+## Guest booking credential
 
-Bookify permite acceder a una reserva Guest
-mediante una credencial emitida por el backend.
+El backend emite `Booking-Guest-Token`
+en la creación inicial de una reserva anónima.
 
-El token se recibe exclusivamente en el header
-`Booking-Guest-Token` de la creación inicial.
+La infraestructura frontend utiliza cookies
+HttpOnly cifradas mediante JWE.
 
-La infraestructura frontend utiliza:
+Archivos:
 
 - `src/lib/auth/guest-credential-crypto.ts`
 - `src/lib/auth/guest-credential-store.ts`
 - `src/lib/auth/guest-api-access.ts`
 
-Las credenciales se conservan cifradas en
-cookies HttpOnly y no forman parte de la
-sesión OIDC.
-
-### Configuración
-
-Agregar a `.env.local`:
+Variable de entorno:
 
 `BOOKIFY_GUEST_COOKIE_KEY`
 
-Utilizar una clave aleatoria de 32 bytes
-codificados en Base64 estándar.
-
 No reutilizar `AUTH_SECRET`.
 
-### Limitaciones
+La credencial es independiente de OIDC.
 
-La credencial Guest no puede recuperarse
-desde el backend si se pierde.
+No puede recuperarse del backend si se pierde.
 
-Su captura real durante la creación de
-reservas pertenece al módulo 26.6.
+La captura durante la creación funcional
+de reservas corresponde a 26.6.
 
-La gestión del token no constituye una
-implementación del flujo público de reservas.
-
-### Documentación
+Documentación:
 
 `docs/architecture/guest-booking-credential.md`
 
 ## Testing frontend
 
-La suite del Módulo 25 utiliza Vitest,
-React Testing Library y Playwright.
-
-### Tests unitarios y de componentes
+Tests unitarios y de componentes:
 
 ```powershell
 pnpm test:unit
-```
-
-Modo interactivo:
-
-```powershell
-pnpm test:watch
 ```
 
 Cobertura:
@@ -334,49 +301,57 @@ Cobertura:
 pnpm test:coverage
 ```
 
-El reporte HTML se genera en:
-
-`coverage/index.html`
-
-### Tests E2E
-
-Compilar primero:
+Tests de navegador:
 
 ```powershell
 pnpm build
-```
-
-Ejecutar Chromium:
-
-```powershell
 pnpm test:e2e
 ```
 
-Interfaz de Playwright:
-
-```powershell
-pnpm test:e2e:ui
-```
-
-### Regresión completa
+Regresión completa:
 
 ```powershell
 pnpm test:all
 ```
 
-### CI
+Resultados verificados en M25:
+
+- 69 pruebas Vitest aprobadas
+- 8 pruebas Playwright aprobadas
+- Build de producción aprobado
+- OpenAPI 3.1.1 validado
+- 33 operaciones documentadas
+
+Los tests E2E iniciales cubren rutas base
+y acceso anónimo, no el flujo público completo.
+
+## CI
 
 Workflow:
 
 `.github/workflows/frontend-ci.yml`
 
-La configuración de CI usa credenciales sintéticas
-y verifica rutas anónimas.
+Ejecución aprobada:
 
-No reemplaza la autenticación real contra
-el proveedor OIDC ni las pruebas E2E de
-los módulos funcionales posteriores.
+https://github.com/merg8511/Bookify.Web.Booking/actions/runs/42922778777
 
-### Documentación
+El CI utiliza credenciales sintéticas y
+no necesita emitir reservas ni pagos reales.
+
+La ejecución definitiva del PR debe aprobarse
+también después de los ajustes de cierre.
+
+## Documentación de cierre
 
 `docs/testing/module-25-final-verification.md`
+
+## Próximo módulo
+
+Módulo 26 — Flujo público de reserva.
+
+Primer submódulo:
+
+26.1 — Property
+
+No iniciar M26 antes de verificar la
+integración de M25 a main.

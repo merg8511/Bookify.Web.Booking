@@ -1,243 +1,246 @@
-# Bookify — Module 25 Final Verification
+# Bookify — Cierre y verificación del Módulo 25
 
-## Scope
+**Fecha:** 2026-11-10
+**Repositorio:** merg8511/Bookify.Web.Booking
+**Branch:** feature/nextjs-frontend-foundations
+**Módulo:** 25 — Fundamentos de Next.js
+**Submódulos:** 25.1–25.7
 
-Module 25 — Next.js Foundations
+**Estado:** Implementación y regresión completadas.
+CI remoto aprobado sobre el commit auditado.
+PR y merge a main pendientes.
 
-Submodule 25.7 — Testing frontend
+## A. Objetivos completados
 
-Frontend repository:
+| Submódulo | Resultado                                          |
+| --------- | -------------------------------------------------- |
+| 25.1      | Next.js, TypeScript, App Router y entorno          |
+| 25.2      | Arquitectura, UI compartida y tokens provisionales |
+| 25.3      | OpenAPI, tipos generados y cliente HTTP            |
+| 25.4      | Problem Details y errores normalizados             |
+| 25.5      | Integración OIDC, sesiones, roles y guards         |
+| 25.6      | Credenciales Guest cifradas y aisladas             |
+| 25.7      | Tests unitarios, componentes, Playwright y CI      |
 
-merg8511/Bookify.Web.Booking
+Las siete entregas están presentes en la branch auditada.
 
-Working branch:
+## B. DEFERRED
 
-feature/nextjs-frontend-foundations
+El DEFERRED hacia 25.7 fue consumido mediante
+la suite consolidada y GitHub Actions.
 
-## Historical baseline
+No se identifican DEFERRED → 25.x sin asignar.
 
-25.1 — Project and environment
-25.2 — Architecture and shared UI
-25.3 — OpenAPI typed client
-25.4 — Problem Details
-25.5 — OIDC authentication
-25.6 — Guest credential protection
-25.7 — Consolidated testing
+Trabajos de módulos posteriores:
 
-The Module 25 branch is the source of truth
-for frontend implementation status.
+- 26.6: creación real de Booking, idempotencia y
+  captura inicial de Booking-Guest-Token.
+- 26.10: E2E del recorrido público completo.
+- 27.1–27.11: consola administrativa y pruebas.
+- 28.2: Stripe Payment Element.
+- 29.2: runtime y despliegue Next.js.
+- 29.4: Docker Compose y proveedor OIDC demo.
+- 29.6: estrategia operacional de migraciones.
 
-Do not replace its state with an older snapshot
-of backend main.
+La retención Guest de 30 días es una decisión
+técnica provisional. Revisar antes del uso
+funcional en 26.6 y antes de producción.
 
-## Source verification
+## C. Archivos del módulo
 
-At preparation time, the inspected GitHub
-commit was:
+Comparación auditada contra el main inicial:
 
-ca1036b5fccc20d842165fcaf05744acba59dd53
+- Archivos añadidos: 71.
+- Archivos modificados respecto de main: 0.
+- Archivos eliminados respecto de main: 0.
 
-The remote snapshot contained 25.1–25.5.
+El repositorio frontend partió de un commit
+inicial sin aplicación.
 
-Module 25.6 was confirmed complete by
-the developer but was not present in
-that published snapshot.
+Grupos principales de archivos:
 
-Before completing this document, reconcile
-the 25.6 local files with the test suite.
+- Configuración de Next.js, TypeScript y pnpm.
+- Variables de entorno y validación.
+- Contrato OpenAPI y tipos TypeScript.
+- Componentes UI y CSS Modules.
+- Cliente HTTP server-only.
+- Normalización de Problem Details.
+- OIDC, roles y seguridad de sesiones.
+- Cifrado, cookies y acceso Guest.
+- Unit tests y component tests.
+- Playwright y GitHub Actions.
+- Documentación técnica.
 
-## Test stack
+No hay Route Handlers temporales de diagnóstico
+en el árbol auditado.
 
-- Vitest
-- React Testing Library
-- DOM Testing Library
-- jest-dom
-- jsdom
-- Playwright
-- GitHub Actions
-- pnpm
+Contrato backend:
 
-## Unit coverage
+OpenAPI 3.1.1, 33 operaciones.
 
-API:
+No se modificó el repositorio backend
+como parte del Módulo 25.
 
-- Problem Details
-- HTTP fallback handling
-- Retry-After
-- Transport errors
-- No automatic retry
-- Successful HTTP responses
+## D. Commits auditados
 
-Authentication:
+Branch HEAD auditada:
 
-- Role mapping
-- Role casing
-- Session guard
-- Admin guard
-- JWT issuer, audience and expiration
+3c37661d6a2d6a3e57789ed73f5c930a46e261b4
 
-Guest:
+Base main auditada:
 
-- JWE encryption/decryption
-- Credential format
-- Booking ID binding
-- Tampered ciphertext
-- Wrong encryption key
-- Cookie capture
-- Cookie isolation
-- Local deletion
-- Guest HTTP headers
+4c6b4f5e7c4150c7e27f6f1ef983af2f999c14a8
 
-## Component coverage
+La branch se encontraba 37 commits por delante
+de main al ejecutar la auditoría.
 
-- Buttons
-- Link security
-- Loading and disabled state
-- Text field labels
-- Error association
-- Status badges
-- Error notices
+Los 37 asuntos cumplen Conventional Commits.
 
-## Browser coverage
+Resumen de etapas:
 
-- Public route
-- Login route
-- Access denied page
-- Anonymous /account protection
-- Anonymous /admin protection
-- Public session does not expose secrets
-- Removed diagnostic routes
-- Basic mobile overflow check
+- Proyecto y configuración inicial.
+- Arquitectura y componentes base.
+- API tipada y OpenAPI.
+- Errores normalizados.
+- OIDC y acceso autenticado.
+- Credenciales Guest.
+- Unit tests, componentes y Playwright.
+- GitHub Actions y correcciones de regresión.
 
-## Known boundaries
+La lista íntegra está disponible en la
+comparación GitHub de la branch contra main.
 
-The baseline CI does not perform real OIDC
-login or authenticate with live user accounts.
+Cualquier commit adicional posterior a este
+documento requiere actualizar el HEAD y
+revisar nuevamente la regresión.
 
-It does not create real bookings or payments.
+## E. Verificación final
 
-Guest booking creation belongs to Module 26.6.
+### Evidencia local compartida
 
-Complete public booking E2E belongs to 26.10.
+Comando:
 
-Administrative E2E belongs to 27.11.
+pnpm test:all
 
-Stripe scenarios belong to Module 28.
+Resultado:
 
-The frontend uses the backend as the
-authority for ownership and business rules.
+- ESLint: PASS
+- TypeScript: PASS
+- OpenAPI 3.1.1: PASS
+- 33 operaciones: PASS
+- Tipos OpenAPI sincronizados: PASS
+- Vitest: 69 PASS, 0 FAIL
+- Archivos Vitest: 9 PASS
+- Playwright Chromium: 8 PASS, 0 FAIL
+- Next.js production build: PASS
 
-## Design System
+### Evidencia GitHub Actions
 
-Approved:
+Workflow:
 
-Public P1 — Editorial Hospitality.
+Bookify Frontend CI
 
-Admin A2 — Concierge Admin.
+Run ID:
 
-The approved color, typography, navigation,
-feedback, responsive and Horizon decisions
-must not be silently changed by tests.
+42922778777
 
-A browser test of provisional styles does
-not certify implementation of the approved
-Design System.
+Run attempt:
 
-Approved visual implementation must be
-tested after integration into the application.
+3
 
-## Verification commands
+Commit:
 
-pnpm install --frozen-lockfile
+3c37661d6a2d6a3e57789ed73f5c930a46e261b4
 
-pnpm api:validate
-pnpm api:check
+Resultado:
 
-pnpm lint
-pnpm typecheck
+SUCCESS
 
-pnpm test:coverage
+Verificado: instalación, OpenAPI, ESLint,
+TypeScript, Vitest, build, Chromium,
+Playwright y subida de reportes.
 
-pnpm build
-pnpm test:e2e
+URL:
 
-## Execution evidence
+https://github.com/merg8511/Bookify.Web.Booking/actions/runs/42922778777
 
-Complete only after running the commands:
+Vitest CI:
 
-Node version:
-PENDING
+- 9 archivos aprobados
+- 69 tests aprobados
 
-pnpm version:
-PENDING
+Playwright CI:
 
-Unit/component tests passed:
-PENDING
+- 8 tests aprobados
 
-Unit/component tests failed:
-PENDING
+Cobertura CI, con verify-api-token.ts incluido:
 
-Coverage summary:
-PENDING
+- Statements: 88.60 %
+- Branches: 84.05 %
+- Functions: 94.11 %
+- Lines: 88.60 %
 
-Playwright passed:
-PENDING
+Los porcentajes pertenecen a la selección
+coverage.include, no a toda la aplicación.
 
-Playwright failed:
-PENDING
+### Riesgos y límites
 
-ESLint:
-PENDING
+- El CI no realiza login contra un OIDC real.
+- La emisión y captura de Guest durante una
+  reserva real se integrará en 26.6.
+- No se realizan pagos Stripe reales.
+- No existen pruebas E2E funcionales de M26–M28.
+- No se modificaron migraciones de base de datos.
+- Las decisiones visuales P1/A2 están aprobadas,
+  pero la implementación completa sigue pendiente.
+- DS-006 continúa PENDING en el Design System.
 
-TypeScript:
-PENDING
+Se requiere nueva ejecución del CI después
+de los últimos ajustes documentales
+y del enmascaramiento de secretos sintéticos.
 
-Production build:
-PENDING
+## F. Pull Request recomendado
 
-OpenAPI validation:
-PENDING
-
-Frontend CI URL:
-PENDING
-
-Frontend CI conclusion:
-PENDING
-
-## Security review
-
-- No real tokens in fixtures
-- No real OIDC credentials in CI
-- No guest credential in browser output
-- No hardcoded production secrets
-- No diagnostic Route Handlers committed
-- No stored authenticated Playwright state
-- Correct backend authorization boundaries
-- No automatic mutating request retries
-
-## Completion criteria
-
-Do not mark Module 25 complete until:
-
-1. All relevant tests are implemented.
-2. The local full verification is green.
-3. The latest frontend CI is green.
-4. The 25.6 files are reconciled.
-5. No module-25 DEFERRED remains unresolved.
-6. The entire module has been audited.
-7. Atomic commits are reviewed.
-8. The Pull Request is ready for review.
-
-## Proposed Pull Request
+Título:
 
 feat(frontend): establish nextjs foundations and secure booking access
 
-The title covers the whole Module 25,
-not only its final testing submodule.
+Base:
 
-## Next module
+main
+
+Compare:
+
+feature/nextjs-frontend-foundations
+
+Estado:
+
+Preparado para revisión tras el último CI verde.
+
+No declarar merge completado hasta verificar
+el Pull Request y su SHA de integración real.
+
+## G. Continuidad hacia Módulo 26
+
+Siguiente módulo principal:
+
+26 — Flujo público de reserva
+
+Primer submódulo:
 
 26.1 — Property
 
-A fresh audit of the appropriate baseline
-is required at the beginning of Module 26.
+Al comenzar M26:
+
+1. Confirmar PR y merge de M25.
+2. Registrar el SHA real de main.
+3. Inspeccionar el frontend integrado en main.
+4. Contrastar el Módulo 26 completo
+   con el código y el backend reales.
+5. Consumir los DEFERRED → 26.x.
+6. Aplicar el Design System aprobado P1.
+7. Recomendar la nueva branch.
+8. Implementar únicamente 26.1.
+
+No iniciar M26 desde una branch
+de M25 todavía no integrada.
