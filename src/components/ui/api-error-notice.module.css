@@ -1,74 +1,107 @@
 /*
- * MÓDULO 25.4 — ERROR NOTICE
+ * BOOKIFY — API ERROR NOTICE
  *
- * Utiliza los tokens semánticos de 25.2.
- * No introduce colores de marca definitivos.
+ * FEEDBACK-001: FB-P1 Calm & Contextual
+ * FEEDBACK-002: FB-A1 Operational Feedback
+ *
+ * El componente presenta errores reales de API.
+ * No cambia códigos HTTP ni comportamiento.
  */
 
 .notice {
+  --notice-tone: var(--color-destructive);
+  --notice-surface: var(--color-destructive-surface);
+
   width: 100%;
   min-width: 0;
 
   padding: var(--space-5);
 
-  border: 1px solid currentColor;
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  border-inline-start: 3px solid var(--notice-tone);
+  border-radius: var(--radius-card, var(--radius-lg));
+
+  background: var(--notice-surface);
+  color: var(--color-foreground);
 }
 
 .content {
   display: flex;
   min-width: 0;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-3);
 }
 
+/* Error general */
+
 .destructive {
-  background: var(--color-destructive-surface);
-  color: var(--color-destructive);
+  --notice-tone: var(--color-destructive);
+  --notice-surface: var(--color-destructive-surface);
 }
 
+/* HTTP 429: respetar el tiempo de espera */
+
 .warning {
-  background: var(--color-warning-surface);
-  color: var(--color-warning);
+  --notice-tone: var(--color-warning);
+  --notice-surface: var(--color-warning-surface);
 }
+
+/* Jerarquía del mensaje */
 
 .title {
   margin: 0;
 
+  color: var(--notice-tone);
+  font-family: var(--font-body);
   font-size: var(--text-base);
-  font-weight: 650;
+  font-weight: 600;
   line-height: 1.4;
+
+  overflow-wrap: anywhere;
 }
 
 .detail {
+  max-width: 70ch;
   margin: 0;
 
+  color: var(--color-foreground);
   font-size: var(--text-sm);
   line-height: 1.65;
 
   overflow-wrap: anywhere;
 }
 
+/* Información de Retry-After */
+
 .retryAfter {
   margin: 0;
 
+  color: var(--color-foreground);
   font-size: var(--text-sm);
   line-height: 1.6;
 }
 
+.retryAfter strong {
+  font-weight: 700;
+}
+
+/* Diagnósticos: disponibles, pero secundarios */
+
 .diagnostics {
   display: flex;
+  width: 100%;
+  min-width: 0;
   flex-direction: column;
   gap: var(--space-1);
 
   padding-top: var(--space-3);
 
-  border-top: 1px solid currentColor;
+  border-top: 1px solid var(--color-border);
 
+  color: var(--color-foreground-muted);
   font-size: var(--text-xs);
   line-height: 1.6;
-
-  opacity: 0.85;
 }
 
 .diagnostics p {
@@ -77,12 +110,41 @@
 }
 
 .diagnostics code {
-  font-family: ui-monospace, monospace;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+
+  font-size: inherit;
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 480px) {
-  .notice {
+/* C1 — Mayor aire editorial */
+
+[data-bookify-ui="public"] .notice {
+  padding: var(--space-6);
+}
+
+/* C2 — Densidad administrativa */
+
+[data-bookify-ui="admin"] .notice {
+  padding: var(--space-4);
+}
+
+/* Responsive */
+
+@media (max-width: 767px) {
+  [data-bookify-ui="public"] .notice {
     padding: var(--space-4);
+  }
+}
+
+/* Compatibilidad con alto contraste del sistema */
+
+@media (forced-colors: active) {
+  .notice {
+    border-color: CanvasText;
+    border-inline-start-color: CanvasText;
+  }
+
+  .title {
+    color: CanvasText;
   }
 }

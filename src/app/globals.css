@@ -1,10 +1,13 @@
 /*
- * MÓDULO 25.2 — GLOBAL STYLES
+ * BOOKIFY — GLOBAL FOUNDATIONS
  *
- * Solo estilos universales.
- * Los estilos de componentes y páginas viven
- * en sus respectivos CSS Modules.
+ * Reset, accesibilidad y comportamiento universal.
+ *
+ * La identidad visual pública y administrativa
+ * se resuelve exclusivamente mediante sus scopes.
  */
+
+/* Box sizing */
 
 *,
 *::before,
@@ -12,12 +15,17 @@
   box-sizing: border-box;
 }
 
+/* Documento */
+
 html {
   min-height: 100%;
+
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
-  min-height: 100vh;
+  min-height: 100svh;
   margin: 0;
 
   background: var(--color-background);
@@ -30,6 +38,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Controles nativos */
+
 button,
 input,
 textarea,
@@ -41,9 +51,13 @@ button {
   cursor: pointer;
 }
 
+/* Enlaces */
+
 a {
   color: inherit;
 }
+
+/* Elementos visuales */
 
 img,
 svg {
@@ -54,23 +68,42 @@ img {
   height: auto;
 }
 
+/*
+ * Foco accesible
+ *
+ * --color-focus se resuelve por experiencia.
+ * DS-006: validación final del color pendiente.
+ */
+
 :focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 3px;
 }
 
+/* Respeto del modo de alto contraste */
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 3px solid Highlight;
+  }
+}
+
 /*
- * Accesibilidad:
- * reducir animaciones y transiciones cuando
- * el usuario así lo solicite en su sistema.
+ * Movimiento reducido
+ *
+ * Se preserva la información y el estado final
+ * sin obligar al usuario a ver animaciones.
  */
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     scroll-behavior: auto !important;
+
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+
     transition-duration: 0.01ms !important;
   }
 }
