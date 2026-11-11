@@ -1,0 +1,88 @@
+/*
+ * BOOKIFY — ADMIN DESIGN SYSTEM
+ *
+ * DS-002: Concierge Admin A2
+ * COLOR-002: Ice & Navy
+ * GEOM-002: Equilibrado Profesional
+ * TIP-002: Inter
+ * MOTION-002: Instant Utility
+ */
+
+[data-bookify-ui="admin"] {
+  min-height: 100svh;
+
+  /* Identidad cromática */
+  --color-background: #edf4fc;
+  --color-background-alt: #e2ecf8;
+  --color-sidebar: #e2ecf8;
+
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+
+  --color-foreground: #142b46;
+  --color-foreground-muted: #4f6279;
+
+  --color-navigation-active: #163d65;
+
+  --color-primary: #1a7355;
+  --color-primary-hover: #145b44;
+  --color-on-primary: #ffffff;
+
+  --color-border: #d2e0ef;
+
+  /* Estados semánticos */
+  --color-success: #176247;
+  --color-success-surface: #dff3e9;
+
+  --color-warning: #8b4d1c;
+  --color-warning-surface: #fff0d8;
+
+  --color-destructive: #b42336;
+  --color-destructive-surface: #fff0f3;
+
+  --color-info: #1b5c96;
+  --color-info-surface: #dcebff;
+
+  /*
+   * Foco técnico provisional.
+   * No cierra la decisión DS-006.
+   */
+  --color-focus: #163d65;
+
+  /* Tipografía exclusiva */
+  --font-body: var(--font-admin-body), "Inter", sans-serif;
+  --font-display: var(--font-body);
+
+  /* Geometría A2 */
+  --radius-button: 8px;
+  --radius-field: 8px;
+  --radius-card: 12px;
+
+  /* Alias de compatibilidad */
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --control-min-height: 40px;
+  --gap-card: 16px;
+
+  /* El admin usa espacio fluido */
+  --layout-max-width: none;
+
+  /* Motion operativo */
+  --motion-panel: 180ms;
+  --motion-panel-distance: 8px;
+  --motion-row-hover: 120ms;
+
+  background: var(--color-background);
+  color: var(--color-foreground);
+
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Controles táctiles cómodos en móvil */
+@media (max-width: 767px) {
+  [data-bookify-ui="admin"] {
+    --control-min-height: 44px;
+  }
+}

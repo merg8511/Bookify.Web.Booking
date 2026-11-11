@@ -1,16 +1,17 @@
 /*
- * MÓDULO 26.1 — PUBLIC DESIGN TOKENS
+ * BOOKIFY — PUBLIC DESIGN SYSTEM
  *
- * COLOR-001: Olive & Ivory.
- * GEOM-001: Editorial Airy.
- *
- * Se aplican exclusivamente al scope público.
+ * DS-001: Editorial Hospitality P1
+ * COLOR-001: Olive & Ivory
+ * GEOM-001: Editorial Airy P2
+ * TIP-001: EB Garamond + Cabin
+ * MOTION-001: Quiet Elegance
  */
 
 [data-bookify-ui="public"] {
   min-height: 100svh;
 
-  /* Colores aprobados P1 */
+  /* Identidad cromática */
   --color-background: #f8f4ee;
   --color-background-alt: #f1ebe2;
   --color-surface: #fffdf9;
@@ -26,7 +27,7 @@
   --color-accent: #b9a080;
   --color-border: #d7d0c5;
 
-  /* Estados semánticos públicos */
+  /* Estados semánticos */
   --color-success: #216246;
   --color-success-surface: #e9f5ed;
 
@@ -39,18 +40,41 @@
   --color-info: #385b87;
   --color-info-surface: #edf4fa;
 
-  /* TIP-001 */
-  --font-body: var(--font-public-body), sans-serif;
+  /*
+   * Foco técnico accesible.
+   * DS-006 aún no tiene HEX final aprobado.
+   */
+  --color-focus: #46502e;
 
-  /* GEOM-001 */
-  --radius-md: 10px;
+  /* Tipografía */
+  --font-body: var(--font-public-body), "Cabin", sans-serif;
+  --font-display: var(--font-public-display), Georgia, serif;
+
+  /* Geometría aprobada */
+  --radius-button: 10px;
+  --radius-field: 12px;
+  --radius-card: 16px;
+  --radius-feature: 20px;
+
+  /* Alias para componentes existentes */
+  --radius-md: 12px;
   --radius-lg: 16px;
 
   --control-min-height: 48px;
+  --gap-card: 24px;
   --layout-max-width: 80rem;
+
+  /* Motion público */
+  --motion-editorial-reveal: 380ms;
+  --motion-editorial-distance: 12px;
 
   background: var(--color-background);
   color: var(--color-foreground);
-
   font-family: var(--font-body);
+}
+
+@media (max-width: 767px) {
+  [data-bookify-ui="public"] {
+    --gap-card: 16px;
+  }
 }
