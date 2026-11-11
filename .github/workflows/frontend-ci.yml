@@ -1,15 +1,16 @@
 name: Bookify Frontend CI
 
 on:
-  push:
-    branches:
-      - feature/nextjs-frontend-foundations
-
   pull_request:
     branches:
       - main
+    types: [opened, synchronize, reopened, ready_for_review]
 
   workflow_dispatch:
+
+concurrency:
+  group: frontend-ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # MÓDULO 25.7:
 # Permisos mínimos de solo lectura.
