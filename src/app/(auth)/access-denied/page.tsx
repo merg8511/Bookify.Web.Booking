@@ -1,44 +1,93 @@
+import { IconShieldLock } from "@tabler/icons-react";
+
+import { BookifyLogo } from "@/components/brand/bookify-logo";
 import { ButtonLink } from "@/components/ui/button";
 
-import { ContentContainer } from "@/components/ui/content-container";
-
-import { StatusBadge } from "@/components/ui/status-badge";
-
-import { Surface } from "@/components/ui/surface";
-
-import styles from "../auth.module.css";
+import styles from "./page.module.css";
 
 /*
- * MÓDULO 25.5 — ACCESS DENIED
+ * BOOKIFY — ACCESS DENIED 04.2
  *
- * No mostramos información de propiedades
- * ni operaciones administrativas.
+ * Concierge Admin A2.
+ * FEEDBACK-002: Operational Feedback.
+ *
+ * Esta pantalla es exclusivamente
+ * presentacional.
+ *
+ * La autorización continúa en
+ * requireAdminSession().
  */
+
 export default function AccessDeniedPage() {
   return (
     <main className={styles.screen}>
-      <ContentContainer>
-        <Surface className={styles.panel}>
-          <p className={styles.eyebrow}>Bookify / Acceso</p>
+      <div className={styles.frame}>
+        {/* IDENTIDAD INSTITUCIONAL */}
 
-          <StatusBadge tone="destructive">Acceso restringido</StatusBadge>
+        <div className={styles.brandPanel}>
+          <div className={styles.brandHeader}>
+            <BookifyLogo context="admin" inverted className={styles.logo} />
 
-          <h1 className={styles.title}>No tienes acceso a esta sección</h1>
-
-          <p className={styles.description}>
-            Tu cuenta no cuenta con los permisos necesarios para acceder al área
-            administrativa.
-          </p>
-
-          <div className={styles.actions}>
-            <ButtonLink href="/account">Volver a mi sesión</ButtonLink>
-
-            <ButtonLink href="/" variant="secondary">
-              Ir al inicio
-            </ButtonLink>
+            <p className={styles.brandCaption}>BOOKIFY · ADMINISTRACIÓN</p>
           </div>
-        </Surface>
-      </ContentContainer>
+
+          <div className={styles.brandContent}>
+            <p className={styles.brandEyebrow}>ESPACIO DE TRABAJO</p>
+
+            <p className={styles.brandTitle}>
+              Un espacio de trabajo protegido.
+            </p>
+
+            <p className={styles.brandDescription}>
+              Cada área de Bookify cuenta con controles de acceso para mantener
+              una operación organizada y segura.
+            </p>
+          </div>
+        </div>
+
+        {/* ESTADO DE ACCESO */}
+
+        <section
+          className={styles.contentPanel}
+          aria-labelledby="access-denied-title"
+        >
+          <div className={styles.content}>
+            <div className={styles.statusIcon} aria-hidden="true">
+              <IconShieldLock size={26} stroke={1.7} />
+            </div>
+
+            <p className={styles.eyebrow}>ACCESO RESTRINGIDO</p>
+
+            <h1 id="access-denied-title" className={styles.title}>
+              No tienes acceso a esta sección
+            </h1>
+
+            <p className={styles.description}>
+              No podemos habilitar este espacio con los permisos de la sesión
+              actual. Puedes revisar tu sesión o regresar al inicio de Bookify.
+            </p>
+
+            <div className={styles.actions}>
+              <ButtonLink href="/account" className={styles.actionLink}>
+                Volver a mi sesión
+              </ButtonLink>
+
+              <ButtonLink
+                href="/"
+                variant="secondary"
+                className={styles.actionLink}
+              >
+                Ir al inicio
+              </ButtonLink>
+            </div>
+
+            <p className={styles.supportNote}>
+              Si consideras que deberías tener acceso, consulta con quien
+              administra tu cuenta.
+            </p>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
