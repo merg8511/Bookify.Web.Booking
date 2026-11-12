@@ -18,7 +18,7 @@ test.describe("Bookify — public foundations", () => {
       page.getByRole("heading", {
         level: 1,
       }),
-    ).toContainText("Una base sólida");
+    ).toContainText("Una estancia especial comienza mucho antes de llegar.");
 
     await expect(page.getByRole("main")).toBeVisible();
   });
@@ -71,6 +71,44 @@ test.describe("Bookify — public foundations", () => {
     });
 
     expect(hasHorizontalOverflow).toBe(false);
+  });
+
+  test("la Home editorial es honesta con el alcance actual", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/");
+
+    await expect(
+      page.getByRole("link", {
+        name: "Conocer la experiencia",
+      }),
+    ).toHaveAttribute("href", "#experiencia");
+
+    await expect(
+      page.getByText(
+        "La búsqueda pública y la reserva en línea todavía no están habilitadas.",
+        { exact: false },
+      ),
+    ).toBeVisible();
+
+    await expect(page.locator("main img")).toHaveCount(3);
+
+    const images = [
+      "/images/demo/home-hero.jpg",
+      "/images/demo/home-room.jpg",
+      "/images/demo/home-terrace.jpg",
+    ];
+
+    for (const path of images) {
+      const response = await request.get(path);
+
+      expect(response.ok(), `Imagen no disponible: ${path}`).toBe(true);
+
+      expect(response.headers()["content-type"]).toContain("image/jpeg");
+    }
+
+    await expect(page.getByRole("contentinfo")).toBeVisible();
   });
 });
 

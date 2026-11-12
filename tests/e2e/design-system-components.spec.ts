@@ -14,7 +14,7 @@ test.describe("Bookify — Design System C1/C2", () => {
     const scope = page.locator('[data-bookify-ui="public"]');
 
     const button = scope.getByRole("link", {
-      name: "Ver repositorio Backend",
+      name: "Conocer la experiencia",
     });
 
     await expect(button).toBeVisible();
