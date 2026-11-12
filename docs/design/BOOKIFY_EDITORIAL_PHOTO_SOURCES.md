@@ -46,3 +46,26 @@ con los términos vigentes de su licencia.
 - Sustituir las imágenes cuando exista soporte
   de medios reales y autorizados.
 - Mantener registro de autor y procedencia.
+
+## Entrega 03.2 — Property editorial
+
+La presentación pública de Property reutiliza:
+
+- Archivo: `public/images/demo/home-room.jpg`
+- Fuente y autor: registrados en la entrega 03.1.
+- Uso: fotografía editorial ilustrativa.
+- Configuración: `src/features/property/property-media.ts`.
+
+### Restricciones
+
+- No corresponde a ningún `propertyId`.
+- No representa una habitación o unidad disponible.
+- No forma parte de la respuesta OpenAPI de Property.
+- Debe mantenerse el aviso visible:
+  "Fotografía ilustrativa. No corresponde a este alojamiento."
+- No debe utilizarse para generar información comercial
+  sobre una propiedad real.
+
+El soporte de fotografías reales requiere un contrato
+backend explícito y su correspondiente actualización
+del roadmap antes de implementarse.
