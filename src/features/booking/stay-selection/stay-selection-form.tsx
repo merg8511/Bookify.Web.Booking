@@ -30,12 +30,18 @@ import {
 import styles from "./stay-selection-form.module.css";
 
 /*
- * M26.2 — RESERVATION JOURNEY F1
+ * M26.2 — STAY SELECTION
  *
- * P-CAL1: calendario de rango conectado.
- * FB-P1: validación contextual.
+ * CAL-001: Rango conectado P-CAL1.
+ * FORM-001: Reservation Journey F1.
+ * FEEDBACK-001: Calm & Contextual.
  *
- * NO consulta disponibilidad ni precios.
+ * Correcciones:
+ * - Fechas pasadas deshabilitadas.
+ * - Navegación anterior limitada al mes actual.
+ * - Seleccionar un día no desplaza el calendario.
+ * - El teclado mantiene el foco visible.
+ * - El resultado de revisión tiene nombre accesible.
  */
 
 const WEEK_DAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"] as const;
@@ -95,8 +101,12 @@ function CalendarMonth({
             );
           }
 
+          // CAMBIO: días anteriores a hoy no seleccionables.
+          const isPast = date < today;
+
           const isStart = date === checkIn;
           const isEnd = date === checkOut;
+
           const inRange =
             Boolean(checkIn && checkOut) && date > checkIn && date < checkOut;
 
@@ -113,7 +123,8 @@ function CalendarMonth({
               key={date}
               type="button"
               data-calendar-day={date}
-              tabIndex={date === focusedDay ? 0 : -1}
+              disabled={isPast}
+              tabIndex={!isPast && date === focusedDay ? 0 : -1}
               className={[
                 styles.day,
                 isStart || isEnd ? styles.selectedDay : "",
@@ -126,6 +137,7 @@ function CalendarMonth({
               aria-label={[
                 accessibleCalendarDate(date),
                 selectedLabel,
+                isPast ? "Fecha pasada" : null,
                 date === today ? "Hoy" : null,
               ]
                 .filter(Boolean)
@@ -147,14 +159,15 @@ export function StaySelectionForm({
 }: StaySelectionFormProps) {
   const calendarHelpId = useId();
   const dateErrorId = useId();
-  const guestHelpId = useId();
+  const guestInputId = useId();
   const guestErrorId = useId();
 
-  const [visibleMonth, setVisibleMonth] = useState(
-    todayInPropertyTimeZone.slice(0, 7),
-  );
+  const today = todayInPropertyTimeZone;
+  const firstAllowedMonth = today.slice(0, 7);
 
-  const [focusedDay, setFocusedDay] = useState(todayInPropertyTimeZone);
+  const [visibleMonth, setVisibleMonth] = useState(firstAllowedMonth);
+
+  const [focusedDay, setFocusedDay] = useState(today);
 
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
@@ -168,15 +181,18 @@ export function StaySelectionForm({
   const pendingCalendarFocusRef = useRef(false);
 
   const nextMonth = addCalendarMonths(visibleMonth, 1);
+  const canGoPrevious = visibleMonth > firstAllowedMonth;
 
-  const validation = validateStaySelection(checkIn, checkOut, guestInput);
+  // CAMBIO: la validación recibe "hoy" de Property.
+  const validation = validateStaySelection(
+    checkIn,
+    checkOut,
+    guestInput,
+    today,
+  );
 
   const nights = checkIn && checkOut ? nightsBetween(checkIn, checkOut) : null;
 
-  /*
-   * Cuando se navega por teclado o por mes,
-   * trasladar el foco al día correspondiente.
-   */
   useEffect(() => {
     if (!pendingCalendarFocusRef.current) {
       return;
@@ -186,28 +202,25 @@ export function StaySelectionForm({
       `[data-calendar-day="${focusedDay}"]`,
     );
 
-    if (day) {
+    // Dentro de useEffect:
+    if (day && !day.disabled) {
       day.focus();
       pendingCalendarFocusRef.current = false;
     }
   }, [visibleMonth, focusedDay]);
 
-  function revealDay(date: string, moveFocus: boolean) {
-    if (moveFocus) {
-      pendingCalendarFocusRef.current = true;
+  /*
+   * CAMBIO: la selección de un día NO mueve el mes.
+   *
+   * Así Noviembre + Diciembre permanecen visibles
+   * al elegir 30/nov -> 02/dic.
+   */
+  function selectDay(date: string) {
+    if (date < today || !parseCalendarDate(date)) {
+      return;
     }
 
     setFocusedDay(date);
-
-    // El mes con foco siempre pasa a ser el primero.
-    // Así el foco nunca queda oculto en móvil.
-    if (date.slice(0, 7) !== visibleMonth) {
-      setVisibleMonth(date.slice(0, 7));
-    }
-  }
-
-  function selectDay(date: string) {
-    revealDay(date, true);
     setConfirmed(false);
 
     if (!checkIn || checkOut || date <= checkIn) {
@@ -216,6 +229,47 @@ export function StaySelectionForm({
     } else {
       setCheckOut(date);
     }
+  }
+
+  /*
+   * El teclado sí puede cambiar el mes visible,
+   * pero solamente cuando el día enfocado quedaría
+   * fuera del calendario presentado.
+   */
+  function revealFocusedDay(date: string) {
+    if (date < today || !parseCalendarDate(date)) {
+      return;
+    }
+
+    const targetMonth = date.slice(0, 7);
+
+    const isCompact =
+      typeof window !== "undefined" &&
+      (typeof window.matchMedia === "function"
+        ? window.matchMedia("(max-width: 900px)").matches
+        : window.innerWidth <= 900);
+
+    if (isCompact) {
+      // Móvil: solo existe un mes visible.
+      if (targetMonth !== visibleMonth) {
+        setVisibleMonth(targetMonth);
+      }
+    } else {
+      // Escritorio: conservamos ambos meses visibles.
+      const targetIsVisible =
+        targetMonth === visibleMonth || targetMonth === nextMonth;
+
+      if (!targetIsVisible) {
+        setVisibleMonth(
+          targetMonth < visibleMonth
+            ? targetMonth
+            : addCalendarMonths(targetMonth, -1),
+        );
+      }
+    }
+
+    pendingCalendarFocusRef.current = true;
+    setFocusedDay(date);
   }
 
   function handleDayKeyDown(
@@ -257,22 +311,31 @@ export function StaySelectionForm({
 
     const newDate = addCalendarDays(date, offset);
 
-    revealDay(newDate, true);
+    // No navegar mediante teclado hacia días pasados.
+    if (newDate < today) {
+      return;
+    }
+
+    revealFocusedDay(newDate);
   }
 
   function changeMonth(amount: number) {
     const month = addCalendarMonths(visibleMonth, amount);
 
-    if (month === visibleMonth) {
+    // CAMBIO: impedir navegar a meses anteriores.
+    if (month === visibleMonth || month < firstAllowedMonth) {
       return;
     }
 
-    setVisibleMonth(month);
-
-    const firstDay = `${month}-01`;
+    const firstFocusableDay =
+      month === firstAllowedMonth ? today : `${month}-01`;
 
     pendingCalendarFocusRef.current = true;
-    setFocusedDay(firstDay);
+
+    setVisibleMonth(month);
+    setFocusedDay(firstFocusableDay);
+
+    // No alterar checkIn/checkOut al navegar.
   }
 
   function changeGuests(amount: number) {
@@ -293,28 +356,30 @@ export function StaySelectionForm({
     event.preventDefault();
     setAttempted(true);
 
-    const result = validateStaySelection(checkIn, checkOut, guestInput);
+    const result = validateStaySelection(checkIn, checkOut, guestInput, today);
 
     if (result.dateError) {
-      pendingCalendarFocusRef.current = true;
+      setConfirmed(false);
 
       const focused = calendarRef.current?.querySelector<HTMLButtonElement>(
         `[data-calendar-day="${focusedDay}"]`,
       );
 
-      focused?.focus();
-      setConfirmed(false);
+      // Dentro de handleSubmit:
+      if (focused && !focused.disabled) {
+        focused.focus();
+      }
+
       return;
     }
 
     if (result.guestError) {
-      guestInputRef.current?.focus();
       setConfirmed(false);
+      guestInputRef.current?.focus();
       return;
     }
 
-    // Confirmación LOCAL de criterios.
-    // No se envía una reserva ni una consulta de API.
+    // Solo revisión local. No se llama al API.
     setConfirmed(true);
   }
 
@@ -350,17 +415,24 @@ export function StaySelectionForm({
             <div className={styles.dateValue}>
               <span className={styles.valueLabel}>Llegada</span>
 
-              <output className={styles.valueText}>
+              {/* CAMBIO: <time> en lugar de <output>. */}
+              <time
+                className={styles.valueText}
+                dateTime={checkIn || undefined}
+              >
                 {formatCalendarDate(checkIn)}
-              </output>
+              </time>
             </div>
 
             <div className={styles.dateValue}>
               <span className={styles.valueLabel}>Salida</span>
 
-              <output className={styles.valueText}>
+              <time
+                className={styles.valueText}
+                dateTime={checkOut || undefined}
+              >
                 {formatCalendarDate(checkOut)}
-              </output>
+              </time>
             </div>
           </div>
 
@@ -386,6 +458,7 @@ export function StaySelectionForm({
                 type="button"
                 className={styles.calendarArrow}
                 aria-label="Mes anterior"
+                disabled={!canGoPrevious}
                 onClick={() => changeMonth(-1)}
               >
                 <CaretLeftIcon size={20} aria-hidden="true" />
@@ -411,7 +484,7 @@ export function StaySelectionForm({
                 focusedDay={focusedDay}
                 checkIn={checkIn}
                 checkOut={checkOut}
-                today={todayInPropertyTimeZone}
+                today={today}
                 onSelect={selectDay}
                 onDayKeyDown={handleDayKeyDown}
               />
@@ -421,7 +494,7 @@ export function StaySelectionForm({
                 focusedDay={focusedDay}
                 checkIn={checkIn}
                 checkOut={checkOut}
-                today={todayInPropertyTimeZone}
+                today={today}
                 secondMonth
                 onSelect={selectDay}
                 onDayKeyDown={handleDayKeyDown}
@@ -438,7 +511,7 @@ export function StaySelectionForm({
 
         <div className={styles.sidePanel}>
           <div className={styles.guestSection}>
-            <label htmlFor={guestHelpId} className={styles.fieldLegend}>
+            <label htmlFor={guestInputId} className={styles.fieldLegend}>
               Huéspedes
             </label>
 
@@ -455,7 +528,7 @@ export function StaySelectionForm({
 
               <input
                 ref={guestInputRef}
-                id={guestHelpId}
+                id={guestInputId}
                 className={styles.guestInput}
                 type="number"
                 inputMode="numeric"
@@ -531,7 +604,11 @@ export function StaySelectionForm({
       </div>
 
       {confirmed && (
-        <div className={styles.confirmation} role="status">
+        <div
+          className={styles.confirmation}
+          role="status"
+          aria-label="Resultado de revisión"
+        >
           <strong>Selección revisada.</strong>
           <span>
             Elegiste {formatCalendarDate(checkIn)} al{" "}

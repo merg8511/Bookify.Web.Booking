@@ -524,3 +524,32 @@
       border-color var(--motion-fast) ease-out;
   }
 }
+
+/*
+ * M26.2 — CALENDARIO
+ * Estados de fechas anteriores al día actual.
+ *
+ * No indica ocupación ni indisponibilidad
+ * comercial; solamente impide fechas pasadas.
+ */
+
+.day:disabled,
+.day:disabled:hover {
+  opacity: 0.4;
+
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-foreground-muted);
+
+  cursor: not-allowed;
+}
+
+.calendarArrow:disabled,
+.calendarArrow:disabled:hover {
+  opacity: 0.45;
+
+  background: var(--color-surface);
+  color: var(--color-foreground-muted);
+
+  cursor: not-allowed;
+}

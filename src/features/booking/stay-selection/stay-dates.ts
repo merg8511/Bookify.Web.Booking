@@ -1,19 +1,18 @@
 /*
  * M26.2 — STAY DATES
  *
- * Reglas verificadas:
- * - check-out posterior al check-in.
- * - huéspedes enteros y positivos.
- * - intervalo [llegada, salida).
+ * Reglas:
+ * - Llegada no anterior al día actual de Property.
+ * - Salida estrictamente posterior a llegada.
+ * - Huéspedes enteros y positivos.
+ * - Intervalo [llegada, salida).
  *
- * No se validan aquí disponibilidad,
- * capacidad por unidad ni precios.
+ * No se calculan disponibilidad, precios
+ * ni capacidad de una unidad.
  */
 
 const MILLISECONDS_PER_DAY = 86_400_000;
 
-// Límite técnico del int usado en el contrato .NET.
-// NO representa la capacidad de una propiedad.
 export const MAX_API_GUEST_COUNT = 2_147_483_647;
 
 export type StayValidation = {
@@ -98,7 +97,6 @@ export function calendarDaysInMonth(isoMonth: string): Array<string | null> {
     return [];
   }
 
-  // Lunes = 0; domingo = 6.
   const leadingDays = (firstDay.getUTCDay() + 6) % 7;
 
   const lastDay = new Date(firstDay);
@@ -136,10 +134,17 @@ export function nightsBetween(
   return Math.round((end.getTime() - start.getTime()) / MILLISECONDS_PER_DAY);
 }
 
+/*
+ * CAMBIO M26.2:
+ * "todayInPropertyTimeZone" se recibe de manera
+ * explícita. Nunca se usa la zona horaria del
+ * navegador como fuente de autoridad.
+ */
 export function validateStaySelection(
   checkIn: string,
   checkOut: string,
   guestInput: string,
+  todayInPropertyTimeZone: string,
 ): StayValidation {
   let dateError: string | null = null;
   let nights: number | null = null;
@@ -148,6 +153,9 @@ export function validateStaySelection(
     dateError = "Selecciona una fecha de llegada.";
   } else if (!parseCalendarDate(checkIn)) {
     dateError = "La fecha de llegada no es válida.";
+  } else if (checkIn < todayInPropertyTimeZone) {
+    // CAMBIO: evitar seleccionar una llegada pasada.
+    dateError = "La fecha de llegada no puede estar en el pasado.";
   } else if (!checkOut) {
     dateError = "Selecciona una fecha de salida.";
   } else {
@@ -236,10 +244,8 @@ export function calendarMonthTitle(isoMonth: string): string {
 }
 
 /*
- * Se usa solamente para abrir el calendario
- * en el mes actual de la propiedad.
- *
- * No es una restricción de fechas disponibles.
+ * El servidor utiliza la zona horaria de Property.
+ * No interpretamos DateOnly como hora de check-in.
  */
 export function getTodayInPropertyTimeZone(
   timeZoneId: string,
@@ -266,7 +272,7 @@ export function getTodayInPropertyTimeZone(
       return value;
     }
   } catch {
-    // Fallback de visualización, no cálculo de Booking.
+    // Fallback técnico si la zona horaria es inválida.
   }
 
   return instant.toISOString().slice(0, 10);
