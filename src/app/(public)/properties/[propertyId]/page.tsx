@@ -99,6 +99,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
    *      sin ofrecer reintento inmediato.
    * Otros: aviso y reintento de lectura GET.
    */
+
   if (!result.ok) {
     if (result.error.status === 404) {
       notFound();
@@ -108,16 +109,30 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
       <main id="contenido-principal" tabIndex={-1} className={styles.page}>
         <ContentContainer>
           <div className={styles.errorContent}>
+            <p className={styles.eyebrow}>
+              INFORMACIÓN TEMPORALMENTE NO DISPONIBLE
+            </p>
+
+            <h1 className={styles.feedbackTitle}>
+              No pudimos mostrar este alojamiento.
+            </h1>
+
             <ApiErrorNotice error={result.error} />
 
-            {result.error.status !== 429 && (
-              <a
-                href={`/properties/${propertyId}`}
-                className={styles.retryLink}
-              >
-                Intentar nuevamente
-              </a>
-            )}
+            <div className={styles.feedbackActions}>
+              {result.error.status !== 429 && (
+                <a
+                  href={`/properties/${propertyId}`}
+                  className={styles.retryLink}
+                >
+                  Intentar nuevamente
+                </a>
+              )}
+
+              <ButtonLink href="/" variant="secondary">
+                Volver al inicio
+              </ButtonLink>
+            </div>
           </div>
         </ContentContainer>
       </main>
@@ -131,9 +146,29 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
       <main id="contenido-principal" tabIndex={-1} className={styles.page}>
         <ContentContainer>
           <div className={styles.errorContent}>
-            <p role="alert">
-              No fue posible obtener la información del alojamiento.
+            <p className={styles.eyebrow}>INFORMACIÓN INCOMPLETA</p>
+
+            <h1 className={styles.feedbackTitle}>
+              No pudimos mostrar este alojamiento.
+            </h1>
+
+            <p className={styles.feedbackDescription} role="alert">
+              La consulta no devolvió la información necesaria para presentar
+              esta propiedad. Puedes intentar cargarla nuevamente.
             </p>
+
+            <div className={styles.feedbackActions}>
+              <a
+                href={`/properties/${propertyId}`}
+                className={styles.retryLink}
+              >
+                Intentar nuevamente
+              </a>
+
+              <ButtonLink href="/" variant="secondary">
+                Volver al inicio
+              </ButtonLink>
+            </div>
           </div>
         </ContentContainer>
       </main>
