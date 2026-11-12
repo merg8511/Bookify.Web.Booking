@@ -1,18 +1,31 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+
+import { ButtonLink } from "@/components/ui/button";
 import { ContentContainer } from "@/components/ui/content-container";
 import { Surface } from "@/components/ui/surface";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ApiErrorNotice } from "@/components/ui/api-error-notice";
+
 import { getPublicProperty } from "@/features/property/get-public-property";
+import { PROPERTY_EDITORIAL_MEDIA } from "@/features/property/property-media";
+
 import styles from "./page.module.css";
 
 /*
- * MÓDULO 26.1 — PUBLIC PROPERTY PAGE
+ * BOOKIFY — PROPERTY EDITORIAL P1
  *
- * Solo contexto de Property.
- * Sin disponibilidad, cotización o reservas.
+ * M26.1: contexto real de Property.
+ * DS-001: Editorial Hospitality.
+ * GEOM-001: Editorial Airy.
+ * RESP-001: Editorial Continuity.
+ *
+ * No incluye fechas, unidades, cotizaciones
+ * ni operaciones de reserva.
  */
+
 type PropertyPageProps = {
   params: Promise<{
     propertyId: string;
@@ -34,10 +47,9 @@ function formatTime(value: string): string {
 }
 
 /*
- * Metadatos de la propiedad real.
- *
- * Se mantiene noindex porque todavía no contamos
- * con suficiente contenido comercial público.
+ * Conservamos la política noindex actual.
+ * No se genera metadata con información
+ * comercial que el backend no proporciona.
  */
 export async function generateMetadata({
   params,
@@ -61,6 +73,7 @@ export async function generateMetadata({
       result.ok && result.data
         ? `${result.data.name} | Bookify`
         : "Alojamiento | Bookify",
+
     robots: {
       index: false,
       follow: false,
@@ -71,12 +84,21 @@ export async function generateMetadata({
 export default async function PropertyPage({ params }: PropertyPageProps) {
   const { propertyId } = await params;
 
+  // No consultar el backend con un UUID inválido.
   if (!isValidPropertyId(propertyId)) {
     notFound();
   }
 
   const result = await getPublicProperty(propertyId);
 
+  /*
+   * Mantener el contrato de errores existente.
+   *
+   * 404: página de no encontrado.
+   * 429: aviso contextual con Retry-After;
+   *      sin ofrecer reintento inmediato.
+   * Otros: aviso y reintento de lectura GET.
+   */
   if (!result.ok) {
     if (result.error.status === 404) {
       notFound();
@@ -108,9 +130,11 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     return (
       <main id="contenido-principal" tabIndex={-1} className={styles.page}>
         <ContentContainer>
-          <p role="alert">
-            No fue posible obtener la información del alojamiento.
-          </p>
+          <div className={styles.errorContent}>
+            <p role="alert">
+              No fue posible obtener la información del alojamiento.
+            </p>
+          </div>
         </ContentContainer>
       </main>
     );
@@ -120,58 +144,134 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     <main id="contenido-principal" tabIndex={-1} className={styles.page}>
       <ContentContainer>
         <div className={styles.content}>
-          <header className={styles.hero}>
-            <p className={styles.eyebrow}>Bookify / Tu alojamiento</p>
+          {/* NAVEGACIÓN CONTEXTUAL */}
 
-            <h1 className={styles.title}>{property.name}</h1>
+          <nav aria-label="Ruta de navegación" className={styles.breadcrumb}>
+            <Link href="/">Inicio</Link>
 
-            <p className={styles.description}>
-              Conoce la información de tu alojamiento antes de elegir tu
-              estancia.
-            </p>
+            <span aria-hidden="true" className={styles.breadcrumbSeparator}>
+              /
+            </span>
 
-            <StatusBadge tone={property.isActive ? "success" : "warning"}>
-              {property.isActive
-                ? "Alojamiento activo"
-                : "No disponible para nuevas reservas"}
-            </StatusBadge>
-          </header>
+            <span aria-current="page">Alojamiento</span>
+          </nav>
+
+          {/* HERO EDITORIAL */}
+
+          <section className={styles.hero} aria-labelledby="property-title">
+            <header className={styles.heroCopy}>
+              <p className={styles.eyebrow}>BOOKIFY / TU ALOJAMIENTO</p>
+
+              <h1 id="property-title" className={styles.title}>
+                {property.name}
+              </h1>
+
+              <p className={styles.description}>
+                Conoce la información esencial de este alojamiento antes de
+                planificar tu estancia.
+              </p>
+
+              <div className={styles.propertyStatus}>
+                <StatusBadge tone={property.isActive ? "success" : "warning"}>
+                  {property.isActive
+                    ? "Propiedad activa"
+                    : "Propiedad inactiva"}
+                </StatusBadge>
+
+                <p className={styles.statusExplanation}>
+                  {property.isActive
+                    ? "El registro de esta propiedad está activo. Su disponibilidad todavía no se consulta desde esta página."
+                    : "Esta propiedad figura como inactiva. No se muestran opciones para reservar."}
+                </p>
+              </div>
+            </header>
+
+            {/* RECURSO EDITORIAL, NO MEDIA DE PROPERTY */}
+
+            <figure className={styles.editorialFigure}>
+              <div className={styles.editorialImageFrame}>
+                <Image
+                  src={PROPERTY_EDITORIAL_MEDIA.src}
+                  alt={PROPERTY_EDITORIAL_MEDIA.alt}
+                  fill
+                  preload
+                  sizes="(max-width: 900px) 100vw, 46vw"
+                  className={styles.editorialImage}
+                />
+              </div>
+
+              <figcaption className={styles.editorialCaption}>
+                {PROPERTY_EDITORIAL_MEDIA.disclosure}
+              </figcaption>
+            </figure>
+          </section>
+
+          {/* DATOS REALES DEL BACKEND */}
 
           <section
-            aria-labelledby="property-information-title"
             className={styles.section}
+            aria-labelledby="property-information-title"
           >
             <div className={styles.sectionHeading}>
-              <p className={styles.eyebrow}>Información de la estancia</p>
+              <p className={styles.eyebrow}>ANTES DE LLEGAR</p>
 
               <h2 id="property-information-title">Horarios del alojamiento</h2>
+
+              <p className={styles.sectionDescription}>
+                Consulta las horas de entrada y salida, así como la zona horaria
+                utilizada por este alojamiento.
+              </p>
             </div>
 
             <Surface className={styles.detailsPanel}>
               <dl className={styles.details}>
                 <div className={styles.detail}>
                   <dt>Check-in</dt>
+
                   <dd>{formatTime(property.checkInTime)}</dd>
                 </div>
 
                 <div className={styles.detail}>
                   <dt>Check-out</dt>
+
                   <dd>{formatTime(property.checkOutTime)}</dd>
                 </div>
 
                 <div className={styles.detail}>
                   <dt>Zona horaria</dt>
+
                   <dd className={styles.timeZoneId}>{property.timeZoneId}</dd>
                 </div>
               </dl>
             </Surface>
           </section>
 
-          {!property.isActive && (
-            <p className={styles.inactiveNotice}>
-              Este alojamiento no está habilitado para recibir nuevas reservas.
-            </p>
-          )}
+          {/* SIGUIENTE PASO: SIN CTA FICTICIO */}
+
+          <section
+            className={styles.nextStep}
+            aria-labelledby="next-step-title"
+          >
+            <div className={styles.nextStepContent}>
+              <p className={styles.eyebrow}>TU ESTANCIA, PASO A PASO</p>
+
+              <h2 id="next-step-title" className={styles.nextStepTitle}>
+                Estamos preparando los siguientes pasos.
+              </h2>
+
+              <p className={styles.nextStepDescription}>
+                La selección de fechas, huéspedes y consulta de disponibilidad
+                se incorporarán al flujo de reserva de Bookify. Por ahora, esta
+                página presenta la información confirmada de la propiedad.
+              </p>
+            </div>
+
+            <div className={styles.nextStepAction}>
+              <ButtonLink href="/" variant="secondary">
+                Volver al inicio
+              </ButtonLink>
+            </div>
+          </section>
         </div>
       </ContentContainer>
     </main>
