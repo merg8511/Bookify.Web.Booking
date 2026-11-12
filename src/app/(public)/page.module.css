@@ -499,23 +499,46 @@
 }
 
 /* ------------------------------------
-   ACCESIBILIDAD Y MOTION
+   MOTION — P-M1 QUIET ELEGANCE
 ------------------------------------ */
 
+/*
+ * Entrada editorial del hero.
+ * Sin delay: contenido y CTA disponibles
+ * desde el primer momento.
+ */
+
 @media (prefers-reduced-motion: no-preference) {
-  .galleryImage {
-    transition: transform 380ms ease-out;
+  .heroCopy {
+    animation: home-editorial-enter var(--motion-editorial-reveal)
+      var(--motion-editorial-easing) both;
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .galleryCard:hover .galleryImage {
-      transform: scale(1.015);
-    }
+  .galleryImage {
+    transition: transform var(--motion-fast) var(--motion-easing);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .galleryImage {
-    transition: none;
+/*
+ * Hover exclusivamente en dispositivos
+ * con puntero preciso y movimiento permitido.
+ */
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .galleryCard:hover .galleryImage {
+    transform: scale(1.015);
+  }
+}
+
+@keyframes home-editorial-enter {
+  from {
+    opacity: 0.94;
+
+    transform: translateY(var(--motion-editorial-distance));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

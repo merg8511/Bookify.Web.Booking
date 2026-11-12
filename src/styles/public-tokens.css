@@ -67,6 +67,7 @@
   /* Motion público */
   --motion-editorial-reveal: 380ms;
   --motion-editorial-distance: 12px;
+  --motion-editorial-easing: ease-out;
 
   background: var(--color-background);
   color: var(--color-foreground);
