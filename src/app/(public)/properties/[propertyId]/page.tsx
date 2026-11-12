@@ -12,18 +12,24 @@ import { ApiErrorNotice } from "@/components/ui/api-error-notice";
 import { getPublicProperty } from "@/features/property/get-public-property";
 import { PROPERTY_EDITORIAL_MEDIA } from "@/features/property/property-media";
 
+// M26.2 — Selección de fechas y huéspedes.
+import { StaySelectionForm } from "@/features/booking/stay-selection/stay-selection-form";
+
+import { getTodayInPropertyTimeZone } from "@/features/booking/stay-selection/stay-dates";
+
 import styles from "./page.module.css";
 
 /*
  * BOOKIFY — PROPERTY EDITORIAL P1
  *
  * M26.1: contexto real de Property.
+ * M26.2: selección de fechas y huéspedes.
+ *
  * DS-001: Editorial Hospitality.
  * GEOM-001: Editorial Airy.
  * RESP-001: Editorial Continuity.
  *
- * No incluye fechas, unidades, cotizaciones
- * ni operaciones de reserva.
+ * No consulta disponibilidad ni precios.
  */
 
 type PropertyPageProps = {
@@ -38,7 +44,7 @@ const PROPERTY_ID_PATTERN =
 function isValidPropertyId(value: string): boolean {
   return (
     PROPERTY_ID_PATTERN.test(value) &&
-    value.toLocaleLowerCase() !== "00000000-0000-0000-0000-000000000000"
+    value.toLowerCase() !== "00000000-0000-0000-0000-000000000000"
   );
 }
 
@@ -46,11 +52,6 @@ function formatTime(value: string): string {
   return /^\d{2}:\d{2}/.test(value) ? value.slice(0, 5) : value;
 }
 
-/*
- * Conservamos la política noindex actual.
- * No se genera metadata con información
- * comercial que el backend no proporciona.
- */
 export async function generateMetadata({
   params,
 }: PropertyPageProps): Promise<Metadata> {
@@ -84,21 +85,11 @@ export async function generateMetadata({
 export default async function PropertyPage({ params }: PropertyPageProps) {
   const { propertyId } = await params;
 
-  // No consultar el backend con un UUID inválido.
   if (!isValidPropertyId(propertyId)) {
     notFound();
   }
 
   const result = await getPublicProperty(propertyId);
-
-  /*
-   * Mantener el contrato de errores existente.
-   *
-   * 404: página de no encontrado.
-   * 429: aviso contextual con Retry-After;
-   *      sin ofrecer reintento inmediato.
-   * Otros: aviso y reintento de lectura GET.
-   */
 
   if (!result.ok) {
     if (result.error.status === 404) {
@@ -179,7 +170,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     <main id="contenido-principal" tabIndex={-1} className={styles.page}>
       <ContentContainer>
         <div className={styles.content}>
-          {/* NAVEGACIÓN CONTEXTUAL */}
+          {/* NAVEGACIÓN CONTEXTUAL — M26.1 */}
 
           <nav aria-label="Ruta de navegación" className={styles.breadcrumb}>
             <Link href="/">Inicio</Link>
@@ -191,7 +182,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
             <span aria-current="page">Alojamiento</span>
           </nav>
 
-          {/* HERO EDITORIAL */}
+          {/* HERO EDITORIAL — M26.1 */}
 
           <section className={styles.hero} aria-labelledby="property-title">
             <header className={styles.heroCopy}>
@@ -215,13 +206,13 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
                 <p className={styles.statusExplanation}>
                   {property.isActive
-                    ? "El registro de esta propiedad está activo. Su disponibilidad todavía no se consulta desde esta página."
+                    ? "El registro de esta propiedad está activo. La disponibilidad se consulta por separado."
                     : "Esta propiedad figura como inactiva. No se muestran opciones para reservar."}
                 </p>
               </div>
             </header>
 
-            {/* RECURSO EDITORIAL, NO MEDIA DE PROPERTY */}
+            {/* Recurso ilustrativo, NO media de Property */}
 
             <figure className={styles.editorialFigure}>
               <div className={styles.editorialImageFrame}>
@@ -241,7 +232,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
             </figure>
           </section>
 
-          {/* DATOS REALES DEL BACKEND */}
+          {/* DATOS REALES DEL BACKEND — M26.1 */}
 
           <section
             className={styles.section}
@@ -262,26 +253,31 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
               <dl className={styles.details}>
                 <div className={styles.detail}>
                   <dt>Check-in</dt>
-
                   <dd>{formatTime(property.checkInTime)}</dd>
                 </div>
 
                 <div className={styles.detail}>
                   <dt>Check-out</dt>
-
                   <dd>{formatTime(property.checkOutTime)}</dd>
                 </div>
 
                 <div className={styles.detail}>
                   <dt>Zona horaria</dt>
-
                   <dd className={styles.timeZoneId}>{property.timeZoneId}</dd>
                 </div>
               </dl>
             </Surface>
           </section>
 
-          {/* SIGUIENTE PASO: SIN CTA FICTICIO */}
+          {/*
+           * M26.2 — NUEVA SECCIÓN FUNCIONAL.
+           *
+           * La propiedad activa permite seleccionar
+           * criterios, no confirmar disponibilidad.
+           *
+           * La propiedad inactiva NO muestra el
+           * formulario de reserva.
+           */}
 
           <section
             className={styles.nextStep}
@@ -291,13 +287,15 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
               <p className={styles.eyebrow}>TU ESTANCIA, PASO A PASO</p>
 
               <h2 id="next-step-title" className={styles.nextStepTitle}>
-                Estamos preparando los siguientes pasos.
+                {property.isActive
+                  ? "Tu estancia comienza con una buena elección."
+                  : "Este alojamiento no recibe nuevas reservas."}
               </h2>
 
               <p className={styles.nextStepDescription}>
-                La selección de fechas, huéspedes y consulta de disponibilidad
-                se incorporarán al flujo de reserva de Bookify. Por ahora, esta
-                página presenta la información confirmada de la propiedad.
+                {property.isActive
+                  ? "Elige tus fechas y la cantidad de huéspedes. Podrás revisar los criterios antes de consultar opciones reales."
+                  : "Puedes consultar la información del alojamiento, pero la selección de una nueva estancia no está habilitada."}
               </p>
             </div>
 
@@ -307,6 +305,14 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
               </ButtonLink>
             </div>
           </section>
+
+          {property.isActive && (
+            <StaySelectionForm
+              todayInPropertyTimeZone={getTodayInPropertyTimeZone(
+                property.timeZoneId,
+              )}
+            />
+          )}
         </div>
       </ContentContainer>
     </main>

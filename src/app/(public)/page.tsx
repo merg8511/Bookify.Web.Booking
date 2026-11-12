@@ -19,16 +19,13 @@ export const metadata: Metadata = {
 /*
  * BOOKIFY — HOME EDITORIAL P1
  *
- * DS-001: Editorial Hospitality.
- * COLOR-001: Olive & Ivory.
- * TIP-001: EB Garamond + Cabin.
- * RESP-001: Editorial Continuity.
+ * M26.2: actualización del estado del recorrido.
  *
  * Las imágenes son referencias editoriales.
  * No representan propiedades reales del backend.
  *
  * No se muestran precios, disponibilidad,
- * destinos, habitaciones ni reservas ficticias.
+ * destinos ni reservas ficticias.
  */
 
 export default function HomePage() {
@@ -189,14 +186,15 @@ export default function HomePage() {
                   02
                 </span>
 
-                <span className={styles.stepStatusUpcoming}>En desarrollo</span>
+                {/* M26.2 — La selección deja de ser pendiente. */}
+                <span className={styles.stepStatusReady}>Disponible</span>
               </div>
 
               <h3>Elige tu estancia</h3>
 
               <p>
-                Estamos preparando la selección de fechas y huéspedes para que
-                puedas planificar tu visita.
+                En la página de una propiedad activa, selecciona fechas, calcula
+                las noches e indica cuántos huéspedes viajarán.
               </p>
             </li>
 
@@ -221,8 +219,9 @@ export default function HomePage() {
           <div className={styles.journeyNote}>
             <p>
               <strong>¿Ya recibiste el enlace de un alojamiento?</strong> Puedes
-              abrirlo directamente para consultar su información. La búsqueda
-              pública y la reserva en línea todavía no están habilitadas.
+              abrirlo directamente, conocer su información y elegir fechas y
+              huéspedes. La consulta de disponibilidad y la reserva en línea
+              todavía no están habilitadas desde este recorrido.
             </p>
           </div>
         </ContentContainer>
