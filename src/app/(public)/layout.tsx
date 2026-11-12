@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { EB_Garamond, Cabin } from "next/font/google";
 
+import { PublicFooter } from "@/components/navigation/public-footer";
+
 import { PublicHeader } from "@/components/navigation/public-header";
 
 import "@/styles/public-tokens.css";
@@ -41,6 +43,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
       <PublicHeader />
 
       {children}
+
+      <PublicFooter />
     </div>
   );
 }

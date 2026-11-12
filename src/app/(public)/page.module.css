@@ -1,44 +1,127 @@
+/*
+ * BOOKIFY — PUBLIC HOME
+ *
+ * DS-001: Editorial Hospitality P1
+ * COLOR-001: Olive & Ivory
+ * GEOM-001: Editorial Airy P2
+ * RESP-001: Editorial Continuity
+ * MOTION-001: Quiet Elegance
+ */
+
 .page {
-  min-height: 100svh;
-  padding-block: clamp(var(--space-12), 8vw, var(--space-16));
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-16);
-}
-
-.hero {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  gap: var(--space-6);
-  max-width: var(--layout-reading-width);
+  min-width: 0;
+  color: var(--color-foreground);
 }
 
 .eyebrow {
   margin: 0;
+
+  color: var(--color-primary);
   font-size: var(--text-xs);
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
+  line-height: 1.5;
   text-transform: uppercase;
 }
 
-.title {
-  max-width: 18ch;
-  margin: 0;
+/* ------------------------------------
+   HERO
+------------------------------------ */
 
-  font-size: var(--text-display);
-  font-weight: 650;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
-  text-wrap: balance;
+.hero {
+  position: relative;
+  isolation: isolate;
+
+  display: flex;
+  min-height: 660px;
+  align-items: center;
+
+  overflow: hidden;
+
+  background: var(--color-background-alt);
 }
 
-.description {
-  max-width: 58ch;
+.heroVisual {
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 0 30%;
+
+  overflow: hidden;
+}
+
+.heroImage {
+  object-fit: cover;
+  object-position: center;
+}
+
+.heroVisual::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+
+  background: linear-gradient(
+    90deg,
+    var(--color-background-alt) 0%,
+    color-mix(in srgb, var(--color-background-alt) 85%, transparent) 24%,
+    color-mix(in srgb, var(--color-background-alt) 20%, transparent) 64%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.heroImageLabel {
+  position: absolute;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 1;
+
+  padding: var(--space-2) var(--space-3);
+
+  border-radius: var(--radius-button);
+
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+
+  color: var(--color-foreground-muted);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.heroContainer {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  width: 100%;
+  min-height: 660px;
+  align-items: center;
+
+  padding-block: var(--space-16);
+}
+
+.heroCopy {
+  display: flex;
+  width: min(57%, 640px);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.heroTitle {
+  max-width: 13ch;
+  margin: 0;
+
+  font-family: var(--font-display, var(--font-public-display));
+  font-size: clamp(3.5rem, 6.3vw, 5.7rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.heroDescription {
+  max-width: 49ch;
   margin: 0;
 
   color: var(--color-foreground-muted);
@@ -46,82 +129,393 @@
   line-height: 1.7;
 }
 
-.actions {
+.heroActions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-3);
 }
 
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-}
-
-.sectionHeader {
-  max-width: 40rem;
-}
-
-.sectionHeader h2 {
-  margin: 0 0 var(--space-3);
-  font-size: var(--text-2xl);
-  line-height: 1.25;
-}
-
-.sectionHeader p {
+.heroFootnote {
+  max-width: 48ch;
   margin: 0;
-  color: var(--color-foreground-muted);
-  line-height: 1.6;
-}
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-4);
-}
-
-.cardTitle {
-  margin: 0 0 var(--space-3);
-  font-size: var(--text-base);
-  font-weight: 650;
-}
-
-.cardDescription {
-  margin: 0;
   color: var(--color-foreground-muted);
   font-size: var(--text-sm);
-  line-height: 1.65;
+  line-height: 1.5;
 }
 
-.note {
-  max-width: 60ch;
+/* ------------------------------------
+   EXPERIENCIA Y GALERÍA
+------------------------------------ */
+
+.experience {
+  padding-block: clamp(72px, 9vw, 120px);
+  scroll-margin-top: 100px;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-8);
+
+  margin-bottom: var(--space-10);
+}
+
+.sectionHeadingCopy {
+  display: flex;
+  max-width: 780px;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.sectionTitle {
   margin: 0;
+
+  font-family: var(--font-display, var(--font-public-display));
+  font-size: clamp(2.35rem, 4.8vw, 4rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+
+  text-wrap: balance;
+}
+
+.sectionDescription {
+  max-width: 38ch;
+  margin: 0;
+
+  color: var(--color-foreground-muted);
+  font-size: var(--text-base);
+  line-height: 1.75;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: var(--gap-card, var(--space-6));
+}
+
+.galleryCard {
+  min-width: 0;
+  margin: 0;
+}
+
+.galleryImageFrame {
+  position: relative;
+  height: clamp(300px, 38vw, 520px);
+
+  overflow: hidden;
+
+  border-radius: var(--radius-card);
+  background: var(--color-background-alt);
+}
+
+.galleryImage {
+  object-fit: cover;
+  object-position: center;
+}
+
+.galleryCaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+
+  padding-top: var(--space-4);
+
+  color: var(--color-foreground);
+  font-family: var(--font-display, var(--font-public-display));
+  font-size: var(--text-xl);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.galleryCaption small {
+  color: var(--color-foreground-muted);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 400;
+}
+
+.photoDisclaimer {
+  margin: var(--space-6) 0 0;
 
   color: var(--color-foreground-muted);
   font-size: var(--text-xs);
   line-height: 1.6;
 }
 
-@media (max-width: 800px) {
-  .grid {
-    grid-template-columns: 1fr;
+/* ------------------------------------
+   RECORRIDO
+------------------------------------ */
+
+.journey {
+  padding-block: clamp(72px, 9vw, 112px);
+
+  background: var(--color-background-alt);
+}
+
+.journeyHeader {
+  display: flex;
+  max-width: 760px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+.journeySteps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-8);
+
+  margin: var(--space-12) 0 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.journeyStep {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.stepTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.stepNumber {
+  color: var(--color-accent);
+  font-family: var(--font-display, var(--font-public-display));
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.stepStatusReady,
+.stepStatusUpcoming {
+  display: inline-flex;
+  align-items: center;
+
+  padding: var(--space-1) var(--space-3);
+
+  border-radius: 999px;
+
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.stepStatusReady {
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+
+.stepStatusUpcoming {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-foreground-muted);
+}
+
+.journeyStep h3 {
+  margin: 0;
+
+  font-family: var(--font-display, var(--font-public-display));
+  font-size: clamp(1.55rem, 2.5vw, 2rem);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.journeyStep p {
+  max-width: 37ch;
+  margin: 0;
+
+  color: var(--color-foreground-muted);
+  font-size: var(--text-sm);
+  line-height: 1.75;
+}
+
+.journeyNote {
+  max-width: 850px;
+  margin-top: var(--space-12);
+  padding: var(--space-5) var(--space-6);
+
+  border-left: 3px solid var(--color-primary);
+  border-radius: 0 var(--radius-button) var(--radius-button) 0;
+
+  background: var(--color-surface);
+}
+
+.journeyNote p {
+  margin: 0;
+
+  color: var(--color-foreground-muted);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
+.journeyNote strong {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+/* ------------------------------------
+   RESPONSIVE
+------------------------------------ */
+
+@media (max-width: 940px) {
+  .hero {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+  }
+
+  .heroContainer {
+    order: 0;
+    min-height: 0;
+
+    padding-block: var(--space-16);
+  }
+
+  .heroVisual {
+    position: relative;
+    inset: auto;
+
+    order: 1;
+
+    width: 100%;
+    min-height: 300px;
+    aspect-ratio: 16 / 9;
+  }
+
+  .heroVisual::after {
+    display: none;
+  }
+
+  .heroCopy {
+    width: 100%;
+    max-width: 720px;
+  }
+
+  .heroTitle {
+    max-width: 15ch;
+  }
+
+  .sectionHeading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+
+  .sectionDescription {
+    max-width: 60ch;
   }
 }
 
-@media (max-width: 480px) {
-  .content {
-    gap: var(--space-12);
+@media (max-width: 767px) {
+  .heroContainer {
+    padding-block: var(--space-12);
   }
 
-  .hero {
+  .heroVisual {
+    min-height: 260px;
+    aspect-ratio: 4 / 3;
+  }
+
+  .heroCopy {
     gap: var(--space-5);
   }
 
-  .title {
-    font-size: clamp(2rem, 9vw, 2.5rem);
+  .heroTitle {
+    max-width: 14ch;
+    font-size: clamp(2.8rem, 10vw, 4.25rem);
   }
 
-  .description {
+  .heroDescription {
     font-size: var(--text-base);
+    line-height: 1.65;
+  }
+
+  .heroActions,
+  .heroActions > a {
+    width: 100%;
+  }
+
+  .experience,
+  .journey {
+    padding-block: var(--space-16);
+  }
+
+  .sectionHeading {
+    margin-bottom: var(--space-8);
+  }
+
+  .gallery {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .galleryImageFrame {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .journeySteps {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+
+    margin-top: var(--space-10);
+  }
+
+  .journeyNote {
+    margin-top: var(--space-10);
+    padding: var(--space-4);
+  }
+}
+
+@media (max-width: 390px) {
+  .heroTitle {
+    font-size: 2.65rem;
+  }
+
+  .heroImageLabel {
+    right: var(--space-3);
+    bottom: var(--space-3);
+  }
+
+  .galleryCaption {
+    font-size: var(--text-lg);
+  }
+}
+
+/* ------------------------------------
+   ACCESIBILIDAD Y MOTION
+------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .galleryImage {
+    transition: transform 380ms ease-out;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .galleryCard:hover .galleryImage {
+      transform: scale(1.015);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .galleryImage {
+    transition: none;
   }
 }
