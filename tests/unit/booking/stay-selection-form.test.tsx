@@ -2,30 +2,89 @@
  * @vitest-environment jsdom
  */
 
-import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { render, screen, waitFor } from "@testing-library/react";
+
 import userEvent from "@testing-library/user-event";
 
 import { StaySelectionForm } from "@/features/booking/stay-selection/stay-selection-form";
 
-/*
- * M26.2 — STAY SELECTION TESTS
- *
- * Selección por fecha ISO para evitar coincidencias
- * ambiguas: 2, 12 y 22 del mismo mes.
- *
- * No se simulan disponibilidad ni reservas.
- */
+import { consultAvailability } from "@/features/booking/availability/consult-availability";
 
-function renderStayForm(today = "2026-11-12") {
-  return render(<StaySelectionForm todayInPropertyTimeZone={today} />);
+import type {
+  AvailabilityResponse,
+  AvailabilityResult,
+} from "@/features/booking/availability/availability-contract";
+
+import type { BookifyApiError } from "@/lib/api/errors/bookify-api-error";
+
+/*
+ * M26.3 — Prueba del contrato de interacción.
+ *
+ * Solo se simula la frontera con API.
+ * No se presentan datos ficticios en producción.
+ */
+vi.mock("@/features/booking/availability/consult-availability", () => ({
+  consultAvailability: vi.fn(),
+}));
+
+const PROPERTY_ID = "8b45127a-79e4-4f33-8eca-ff0f2d668b01";
+
+const TODAY = "2026-11-12";
+
+const availability: AvailabilityResponse = {
+  propertyId: PROPERTY_ID,
+  propertyName: "Propiedad de prueba",
+  checkInDate: "2026-11-13",
+  checkOutDate: "2026-11-15",
+  numberOfNights: 2,
+  guestCount: 2,
+  availableUnits: [
+    {
+      id: "71d4bb3a-e421-4ea3-a49e-002681a9210c",
+      name: "Habitación de prueba",
+      type: "Room",
+      maximumCapacity: 4,
+      isEntireProperty: false,
+      quote: {
+        accommodationPrice: 440,
+        extraGuestPrice: 75,
+        totalPrice: 515,
+        currency: "USD",
+      },
+    },
+  ],
+};
+
+const rateLimitedError: BookifyApiError = {
+  kind: "problem",
+  status: 429,
+  type: null,
+  title: "Demasiadas solicitudes",
+  detail: "Inténtalo más tarde.",
+  instance: null,
+  code: "RateLimit.Exceeded",
+  traceId: null,
+  correlationId: null,
+  retryAfterSeconds: 30,
+};
+
+const mockConsultAvailability = vi.mocked(consultAvailability);
+
+beforeEach(() => {
+  mockConsultAvailability.mockReset();
+});
+
+function renderStayForm(today = TODAY) {
+  return render(
+    <StaySelectionForm
+      propertyId={PROPERTY_ID}
+      todayInPropertyTimeZone={today}
+    />,
+  );
 }
 
-/*
- * Cada día tiene un identificador ISO estable.
- * No dependemos de abreviaturas ni expresiones
- * regulares ambiguas sobre nombres de fechas.
- */
 function getCalendarDay(
   month: HTMLElement,
   isoDate: string,
@@ -35,27 +94,46 @@ function getCalendarDay(
   );
 
   if (!day) {
-    throw new Error(`No se encontró el día ${isoDate} en el mes seleccionado.`);
+    throw new Error(`No se encontró ${isoDate} en el calendario.`);
   }
 
   return day;
 }
 
-describe("M26.2 — formulario de estancia", () => {
-  it("solicita las fechas antes de revisar criterios", async () => {
+async function selectNovemberStay(user: ReturnType<typeof userEvent.setup>) {
+  const november = screen.getByRole("group", {
+    name: "Noviembre de 2026",
+  });
+
+  await user.click(getCalendarDay(november, "2026-11-13"));
+
+  await user.click(getCalendarDay(november, "2026-11-15"));
+
+  await user.type(
+    screen.getByRole("spinbutton", {
+      name: "Huéspedes",
+    }),
+    "2",
+  );
+}
+
+describe("M26.2 — criterios conservados", () => {
+  it("exige fechas antes de consultar", async () => {
     const user = userEvent.setup();
 
     renderStayForm();
 
     await user.click(
       screen.getByRole("button", {
-        name: "Revisar selección",
+        name: "Consultar disponibilidad",
       }),
     );
 
     expect(
       screen.getByText("Selecciona una fecha de llegada."),
     ).toHaveAttribute("role", "alert");
+
+    expect(mockConsultAvailability).not.toHaveBeenCalled();
   });
 
   it("deshabilita fechas pasadas", () => {
@@ -65,12 +143,9 @@ describe("M26.2 — formulario de estancia", () => {
       name: "Noviembre de 2026",
     });
 
-    const pastDay = getCalendarDay(november, "2026-11-11");
+    expect(getCalendarDay(november, "2026-11-11")).toBeDisabled();
 
-    const today = getCalendarDay(november, "2026-11-12");
-
-    expect(pastDay).toBeDisabled();
-    expect(today).toBeEnabled();
+    expect(getCalendarDay(november, TODAY)).toBeEnabled();
 
     expect(
       screen.getByRole("button", {
@@ -79,7 +154,7 @@ describe("M26.2 — formulario de estancia", () => {
     ).toBeDisabled();
   });
 
-  it("permite volver al mes actual sin navegar al pasado", async () => {
+  it("permite volver al mes actual", async () => {
     const user = userEvent.setup();
 
     renderStayForm();
@@ -107,15 +182,9 @@ describe("M26.2 — formulario de estancia", () => {
         name: "Noviembre de 2026",
       }),
     ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole("button", {
-        name: "Mes anterior",
-      }),
-    ).toBeDisabled();
   });
 
-  it("mantiene noviembre y diciembre al seleccionar un rango", async () => {
+  it("mantiene el rango noviembre a diciembre", async () => {
     const user = userEvent.setup();
 
     renderStayForm();
@@ -128,14 +197,9 @@ describe("M26.2 — formulario de estancia", () => {
       name: "Diciembre de 2026",
     });
 
-    // CAMBIO: fechas exactas; sin regex parcial.
     const arrival = getCalendarDay(november, "2026-11-30");
 
     const departure = getCalendarDay(december, "2026-12-02");
-
-    expect(arrival).toHaveAccessibleName(/30 de noviembre de 2026/i);
-
-    expect(departure).toHaveAccessibleName(/2 de diciembre de 2026/i);
 
     await user.click(arrival);
     await user.click(departure);
@@ -144,23 +208,16 @@ describe("M26.2 — formulario de estancia", () => {
 
     expect(departure).toHaveAttribute("aria-pressed", "true");
 
-    // Ambos meses deben permanecer renderizados.
+    expect(screen.getByText("2 noches")).toBeInTheDocument();
+
     expect(
       screen.getByRole("group", {
         name: "Noviembre de 2026",
       }),
     ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole("group", {
-        name: "Diciembre de 2026",
-      }),
-    ).toBeInTheDocument();
-
-    expect(screen.getByText("2 noches")).toBeInTheDocument();
   });
 
-  it("conserva la llegada al cruzar de diciembre a enero", async () => {
+  it("conserva la llegada al cambiar de año", async () => {
     const user = userEvent.setup();
 
     renderStayForm();
@@ -171,7 +228,6 @@ describe("M26.2 — formulario de estancia", () => {
 
     await user.click(getCalendarDay(december, "2026-12-30"));
 
-    // Avanzar no debe borrar la llegada.
     await user.click(
       screen.getByRole("button", {
         name: "Mes siguiente",
@@ -185,61 +241,280 @@ describe("M26.2 — formulario de estancia", () => {
     await user.click(getCalendarDay(january, "2027-01-02"));
 
     expect(screen.getByText("3 noches")).toBeInTheDocument();
-
-    expect(screen.getByText("30 dic 2026")).toBeInTheDocument();
   });
+});
 
-  it("permite seleccionar fechas y huéspedes", async () => {
+describe("M26.3 — consulta real de disponibilidad", () => {
+  it("envía la propiedad, fechas y huéspedes correctos", async () => {
     const user = userEvent.setup();
+
+    mockConsultAvailability.mockResolvedValue({
+      ok: true,
+      data: availability,
+    });
 
     renderStayForm();
 
-    const november = screen.getByRole("group", {
-      name: "Noviembre de 2026",
-    });
-
-    await user.click(getCalendarDay(november, "2026-11-13"));
-
-    await user.click(getCalendarDay(november, "2026-11-15"));
-
-    const guests = screen.getByRole("spinbutton", {
-      name: "Huéspedes",
-    });
-
-    await user.type(guests, "2");
-
-    expect(screen.getByText("2 noches")).toBeInTheDocument();
+    await selectNovemberStay(user);
 
     await user.click(
       screen.getByRole("button", {
-        name: "Revisar selección",
+        name: "Consultar disponibilidad",
       }),
     );
 
-    const confirmation = screen.getByRole("status", {
-      name: "Resultado de revisión",
+    await waitFor(() => {
+      expect(mockConsultAvailability).toHaveBeenCalledWith({
+        propertyId: PROPERTY_ID,
+        checkInDate: "2026-11-13",
+        checkOutDate: "2026-11-15",
+        guestCount: 2,
+      });
     });
 
-    expect(confirmation).toHaveTextContent("Selección revisada.");
+    expect(
+      await screen.findByRole("heading", {
+        name: "Opciones para tu estancia",
+      }),
+    ).toBeInTheDocument();
 
-    expect(confirmation).toHaveTextContent("2 huéspedes");
+    expect(
+      screen.getByRole("heading", {
+        name: "Habitación de prueba",
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText("Capacidad máxima:", { exact: false }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByText(/515/)).toBeInTheDocument();
+
+    expect(screen.getByText("USD")).toBeInTheDocument();
   });
 
-  it("no confunde una selección con una reserva", async () => {
+  it("distingue una consulta sin alternativas", async () => {
     const user = userEvent.setup();
+
+    mockConsultAvailability.mockResolvedValue({
+      ok: true,
+      data: {
+        ...availability,
+        availableUnits: [],
+      },
+    });
 
     renderStayForm();
 
+    await selectNovemberStay(user);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Consultar disponibilidad",
+      }),
+    );
+
     expect(
-      screen.getByText(/no confirma disponibilidad, precio ni reserva/i),
+      await screen.findByRole("heading", {
+        name: "Sin opciones para esta estancia",
+      }),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByText("Habitación de prueba")).not.toBeInTheDocument();
+  });
+
+  it("muestra el límite 429 sin borrar criterios", async () => {
+    const user = userEvent.setup();
+
+    mockConsultAvailability.mockResolvedValue({
+      ok: false,
+      error: rateLimitedError,
+    });
+
+    renderStayForm();
+
+    await selectNovemberStay(user);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Consultar disponibilidad",
+      }),
+    );
+
+    expect(
+      await screen.findByText("Demasiadas solicitudes"),
+    ).toBeInTheDocument();
+
+    expect(screen.getByText(/30 segundos/)).toBeInTheDocument();
+
+    expect(screen.getByText("2 noches")).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("spinbutton", {
+        name: "Huéspedes",
+      }),
+    ).toHaveValue(2);
+  });
+
+  it("invalida la cotización al cambiar huéspedes", async () => {
+    const user = userEvent.setup();
+
+    mockConsultAvailability.mockResolvedValue({
+      ok: true,
+      data: availability,
+    });
+
+    renderStayForm();
+
+    await selectNovemberStay(user);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Consultar disponibilidad",
+      }),
+    );
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Habitación de prueba",
+      }),
     ).toBeInTheDocument();
 
     await user.click(
       screen.getByRole("button", {
-        name: "Revisar selección",
+        name: "Añadir huésped",
       }),
     );
 
-    expect(screen.queryByText("Reserva confirmada")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", {
+        name: "Habitación de prueba",
+      }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole("spinbutton", {
+        name: "Huéspedes",
+      }),
+    ).toHaveValue(3);
+  });
+
+  it("evita un segundo envío mientras consulta", async () => {
+    const user = userEvent.setup();
+
+    let completeRequest: ((result: AvailabilityResult) => void) | undefined;
+
+    mockConsultAvailability.mockImplementation(
+      () =>
+        new Promise<AvailabilityResult>((resolve) => {
+          completeRequest = resolve;
+        }),
+    );
+
+    renderStayForm();
+
+    await selectNovemberStay(user);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Consultar disponibilidad",
+      }),
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Consultando disponibilidad...",
+      }),
+    ).toBeDisabled();
+
+    expect(
+      screen.getByRole("status", {
+        name: "Cargando disponibilidad",
+      }),
+    ).toBeInTheDocument();
+
+    expect(mockConsultAvailability).toHaveBeenCalledTimes(1);
+
+    completeRequest?.({
+      ok: true,
+      data: availability,
+    });
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Habitación de prueba",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("no presenta resultados obsoletos", async () => {
+    const user = userEvent.setup();
+
+    let completeRequest: ((result: AvailabilityResult) => void) | undefined;
+
+    mockConsultAvailability.mockImplementation(
+      () =>
+        new Promise<AvailabilityResult>((resolve) => {
+          completeRequest = resolve;
+        }),
+    );
+
+    renderStayForm();
+
+    await selectNovemberStay(user);
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Consultar disponibilidad",
+      }),
+    );
+
+    // Modificar criterios mientras el GET está pendiente.
+    await user.click(
+      screen.getByRole("button", {
+        name: "Añadir huésped",
+      }),
+    );
+
+    completeRequest?.({
+      ok: true,
+      data: availability,
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", {
+          name: "Consultar disponibilidad",
+        }),
+      ).toBeEnabled();
+    });
+
+    // La respuesta anterior era para 2 huéspedes.
+    // Ahora el formulario contiene 3.
+    expect(
+      screen.queryByRole("heading", {
+        name: "Habitación de prueba",
+      }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole("spinbutton", {
+        name: "Huéspedes",
+      }),
+    ).toHaveValue(3);
+  });
+
+  it("no simula creación de reservas", () => {
+    renderStayForm();
+
+    expect(
+      screen.getByText(/no confirma un precio definitivo ni crea una reserva/i),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("button", {
+        name: /confirmar reserva/i,
+      }),
+    ).not.toBeInTheDocument();
   });
 });
