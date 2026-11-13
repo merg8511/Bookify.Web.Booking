@@ -14,6 +14,16 @@ import { CaretRightIcon } from "@phosphor-icons/react/dist/csr/CaretRight";
 import { MinusIcon } from "@phosphor-icons/react/dist/csr/Minus";
 import { PlusIcon } from "@phosphor-icons/react/dist/csr/Plus";
 
+import { consultAvailability } from "@/features/booking/availability/consult-availability";
+import { AvailabilityResults } from "@/features/booking/availability/availability-results";
+
+import type {
+  AvailabilityCriteria,
+  AvailabilityResult,
+} from "@/features/booking/availability/availability-contract";
+
+import { normalizeThrownError } from "@/lib/api/errors/normalize-api-error";
+
 import {
   MAX_API_GUEST_COUNT,
   accessibleCalendarDate,
@@ -30,23 +40,22 @@ import {
 import styles from "./stay-selection-form.module.css";
 
 /*
- * M26.2 — STAY SELECTION
+ * BOOKIFY — RESERVATION JOURNEY
  *
- * CAL-001: Rango conectado P-CAL1.
- * FORM-001: Reservation Journey F1.
- * FEEDBACK-001: Calm & Contextual.
+ * M26.2: fechas y huéspedes.
+ * M26.3: disponibilidad y cotización real.
  *
- * Correcciones:
- * - Fechas pasadas deshabilitadas.
- * - Navegación anterior limitada al mes actual.
- * - Seleccionar un día no desplaza el calendario.
- * - El teclado mantiene el foco visible.
- * - El resultado de revisión tiene nombre accesible.
+ * FORM-001: F1.
+ * CAL-001: P-CAL1.
+ * FEEDBACK-001: FB-P1.
+ *
+ * Sin selección de unidad ni creación de Booking.
  */
 
 const WEEK_DAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"] as const;
 
 type StaySelectionFormProps = {
+  propertyId: string;
   todayInPropertyTimeZone: string;
 };
 
@@ -59,6 +68,11 @@ type CalendarMonthProps = {
   secondMonth?: boolean;
   onSelect: (date: string) => void;
   onDayKeyDown: (event: KeyboardEvent<HTMLButtonElement>, date: string) => void;
+};
+
+type Consultation = {
+  criteria: AvailabilityCriteria;
+  result: AvailabilityResult;
 };
 
 function CalendarMonth({
@@ -101,9 +115,7 @@ function CalendarMonth({
             );
           }
 
-          // CAMBIO: días anteriores a hoy no seleccionables.
           const isPast = date < today;
-
           const isStart = date === checkIn;
           const isEnd = date === checkOut;
 
@@ -154,7 +166,32 @@ function CalendarMonth({
   );
 }
 
+function responseMatchesCriteria(
+  result: AvailabilityResult,
+  criteria: AvailabilityCriteria,
+): boolean {
+  if (!result.ok) {
+    return true;
+  }
+
+  const data = result.data;
+
+  const expectedNights = nightsBetween(
+    criteria.checkInDate,
+    criteria.checkOutDate,
+  );
+
+  return (
+    data.propertyId.toLowerCase() === criteria.propertyId.toLowerCase() &&
+    data.checkInDate === criteria.checkInDate &&
+    data.checkOutDate === criteria.checkOutDate &&
+    Number(data.guestCount) === criteria.guestCount &&
+    Number(data.numberOfNights) === expectedNights
+  );
+}
+
 export function StaySelectionForm({
+  propertyId,
   todayInPropertyTimeZone,
 }: StaySelectionFormProps) {
   const calendarHelpId = useId();
@@ -174,16 +211,23 @@ export function StaySelectionForm({
   const [guestInput, setGuestInput] = useState("");
 
   const [attempted, setAttempted] = useState(false);
-  const [confirmed, setConfirmed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [consultation, setConsultation] = useState<Consultation | null>(null);
 
   const calendarRef = useRef<HTMLDivElement>(null);
   const guestInputRef = useRef<HTMLInputElement>(null);
   const pendingCalendarFocusRef = useRef(false);
 
+  // M26.3: evita consultas simultáneas duplicadas.
+  const inFlightRef = useRef(false);
+
+  // M26.3: descarta respuestas de criterios antiguos.
+  const requestGenerationRef = useRef(0);
+
   const nextMonth = addCalendarMonths(visibleMonth, 1);
   const canGoPrevious = visibleMonth > firstAllowedMonth;
 
-  // CAMBIO: la validación recibe "hoy" de Property.
   const validation = validateStaySelection(
     checkIn,
     checkOut,
@@ -202,7 +246,6 @@ export function StaySelectionForm({
       `[data-calendar-day="${focusedDay}"]`,
     );
 
-    // Dentro de useEffect:
     if (day && !day.disabled) {
       day.focus();
       pendingCalendarFocusRef.current = false;
@@ -210,18 +253,24 @@ export function StaySelectionForm({
   }, [visibleMonth, focusedDay]);
 
   /*
-   * CAMBIO: la selección de un día NO mueve el mes.
+   * M26.3:
+   * Cualquier cambio de criterios invalida
+   * inmediatamente el resultado anterior.
    *
-   * Así Noviembre + Diciembre permanecen visibles
-   * al elegir 30/nov -> 02/dic.
+   * Navegar entre meses NO modifica criterios.
    */
+  function invalidateConsultation() {
+    requestGenerationRef.current += 1;
+    setConsultation(null);
+  }
+
   function selectDay(date: string) {
     if (date < today || !parseCalendarDate(date)) {
       return;
     }
 
     setFocusedDay(date);
-    setConfirmed(false);
+    invalidateConsultation();
 
     if (!checkIn || checkOut || date <= checkIn) {
       setCheckIn(date);
@@ -231,11 +280,6 @@ export function StaySelectionForm({
     }
   }
 
-  /*
-   * El teclado sí puede cambiar el mes visible,
-   * pero solamente cuando el día enfocado quedaría
-   * fuera del calendario presentado.
-   */
   function revealFocusedDay(date: string) {
     if (date < today || !parseCalendarDate(date)) {
       return;
@@ -250,12 +294,10 @@ export function StaySelectionForm({
         : window.innerWidth <= 900);
 
     if (isCompact) {
-      // Móvil: solo existe un mes visible.
       if (targetMonth !== visibleMonth) {
         setVisibleMonth(targetMonth);
       }
     } else {
-      // Escritorio: conservamos ambos meses visibles.
       const targetIsVisible =
         targetMonth === visibleMonth || targetMonth === nextMonth;
 
@@ -311,7 +353,6 @@ export function StaySelectionForm({
 
     const newDate = addCalendarDays(date, offset);
 
-    // No navegar mediante teclado hacia días pasados.
     if (newDate < today) {
       return;
     }
@@ -322,7 +363,6 @@ export function StaySelectionForm({
   function changeMonth(amount: number) {
     const month = addCalendarMonths(visibleMonth, amount);
 
-    // CAMBIO: impedir navegar a meses anteriores.
     if (month === visibleMonth || month < firstAllowedMonth) {
       return;
     }
@@ -334,8 +374,6 @@ export function StaySelectionForm({
 
     setVisibleMonth(month);
     setFocusedDay(firstFocusableDay);
-
-    // No alterar checkIn/checkOut al navegar.
   }
 
   function changeGuests(amount: number) {
@@ -344,28 +382,38 @@ export function StaySelectionForm({
     const current =
       Number.isInteger(parsed) && parsed >= 1 && parsed <= MAX_API_GUEST_COUNT
         ? parsed
-        : 1;
+        : 0;
 
     const next = Math.max(1, Math.min(MAX_API_GUEST_COUNT, current + amount));
 
+    invalidateConsultation();
     setGuestInput(String(next));
-    setConfirmed(false);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  /*
+   * M26.3:
+   * La acción principal consulta datos reales.
+   */
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setAttempted(true);
 
-    const result = validateStaySelection(checkIn, checkOut, guestInput, today);
+    if (inFlightRef.current) {
+      return;
+    }
 
-    if (result.dateError) {
-      setConfirmed(false);
+    const currentValidation = validateStaySelection(
+      checkIn,
+      checkOut,
+      guestInput,
+      today,
+    );
 
+    if (currentValidation.dateError) {
       const focused = calendarRef.current?.querySelector<HTMLButtonElement>(
         `[data-calendar-day="${focusedDay}"]`,
       );
 
-      // Dentro de handleSubmit:
       if (focused && !focused.disabled) {
         focused.focus();
       }
@@ -373,19 +421,67 @@ export function StaySelectionForm({
       return;
     }
 
-    if (result.guestError) {
-      setConfirmed(false);
+    if (currentValidation.guestError || currentValidation.guestCount === null) {
       guestInputRef.current?.focus();
       return;
     }
 
-    // Solo revisión local. No se llama al API.
-    setConfirmed(true);
+    const criteria: AvailabilityCriteria = {
+      propertyId,
+      checkInDate: checkIn,
+      checkOutDate: checkOut,
+      guestCount: currentValidation.guestCount,
+    };
+
+    const requestId = ++requestGenerationRef.current;
+
+    inFlightRef.current = true;
+    setIsLoading(true);
+    setConsultation(null);
+
+    try {
+      const result = await consultAvailability(criteria);
+
+      if (requestId !== requestGenerationRef.current) {
+        return;
+      }
+
+      /*
+       * Defensa adicional:
+       * no presentar una cotización correspondiente
+       * a otra propiedad, período o cantidad.
+       */
+      const safeResult: AvailabilityResult = responseMatchesCriteria(
+        result,
+        criteria,
+      )
+        ? result
+        : {
+            ok: false,
+            error: normalizeThrownError(
+              new Error("Availability response did not match criteria."),
+            ),
+          };
+
+      setConsultation({
+        criteria,
+        result: safeResult,
+      });
+    } catch (error: unknown) {
+      if (requestId === requestGenerationRef.current) {
+        setConsultation({
+          criteria,
+          result: {
+            ok: false,
+            error: normalizeThrownError(error),
+          },
+        });
+      }
+    } finally {
+      inFlightRef.current = false;
+      setIsLoading(false);
+    }
   }
-
-  const minusDisabled = guestInput === "1";
-
-  const plusDisabled = guestInput === String(MAX_API_GUEST_COUNT);
 
   return (
     <form
@@ -415,7 +511,6 @@ export function StaySelectionForm({
             <div className={styles.dateValue}>
               <span className={styles.valueLabel}>Llegada</span>
 
-              {/* CAMBIO: <time> en lugar de <output>. */}
               <time
                 className={styles.valueText}
                 dateTime={checkIn || undefined}
@@ -520,7 +615,7 @@ export function StaySelectionForm({
                 type="button"
                 className={styles.guestButton}
                 aria-label="Quitar huésped"
-                disabled={minusDisabled}
+                disabled={guestInput === "1"}
                 onClick={() => changeGuests(-1)}
               >
                 <MinusIcon size={18} aria-hidden="true" />
@@ -542,8 +637,8 @@ export function StaySelectionForm({
                   attempted && validation.guestError ? guestErrorId : undefined
                 }
                 onChange={(event) => {
+                  invalidateConsultation();
                   setGuestInput(event.target.value);
-                  setConfirmed(false);
                 }}
               />
 
@@ -551,7 +646,7 @@ export function StaySelectionForm({
                 type="button"
                 className={styles.guestButton}
                 aria-label="Añadir huésped"
-                disabled={plusDisabled}
+                disabled={guestInput === String(MAX_API_GUEST_COUNT)}
                 onClick={() => changeGuests(1)}
               >
                 <PlusIcon size={18} aria-hidden="true" />
@@ -592,33 +687,33 @@ export function StaySelectionForm({
             </p>
           </div>
 
-          <button type="submit" className={styles.primaryAction}>
-            Revisar selección
-            <CaretRightIcon size={20} aria-hidden="true" />
+          {/* M26.3: acción conectada a disponibilidad */}
+          <button
+            type="submit"
+            className={styles.primaryAction}
+            disabled={isLoading}
+            aria-busy={isLoading}
+          >
+            {isLoading
+              ? "Consultando disponibilidad..."
+              : "Consultar disponibilidad"}
+
+            {!isLoading && <CaretRightIcon size={20} aria-hidden="true" />}
           </button>
 
           <p className={styles.disclaimer}>
-            Esta selección no confirma disponibilidad, precio ni reserva.
+            Consultar disponibilidad no confirma un precio definitivo ni crea
+            una reserva.
           </p>
         </div>
       </div>
 
-      {confirmed && (
-        <div
-          className={styles.confirmation}
-          role="status"
-          aria-label="Resultado de revisión"
-        >
-          <strong>Selección revisada.</strong>
-          <span>
-            Elegiste {formatCalendarDate(checkIn)} al{" "}
-            {formatCalendarDate(checkOut)}, con {validation.guestCount}{" "}
-            {validation.guestCount === 1 ? "huésped" : "huéspedes"}. Los
-            criterios son válidos para continuar con la futura consulta de
-            disponibilidad.
-          </span>
-        </div>
-      )}
+      {/* M26.3: feedback y resultados reales */}
+      <AvailabilityResults
+        criteria={consultation?.criteria ?? null}
+        result={consultation?.result ?? null}
+        loading={isLoading}
+      />
     </form>
   );
 }

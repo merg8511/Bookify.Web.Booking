@@ -19,19 +19,18 @@ export const metadata: Metadata = {
 /*
  * BOOKIFY — HOME EDITORIAL P1
  *
- * M26.2: actualización del estado del recorrido.
+ * M26.1: contexto de Property.
+ * M26.2: fechas y huéspedes.
+ * M26.3: disponibilidad y cotización.
  *
- * Las imágenes son referencias editoriales.
- * No representan propiedades reales del backend.
- *
- * No se muestran precios, disponibilidad,
- * destinos ni reservas ficticias.
+ * Imágenes exclusivamente ilustrativas.
+ * No hay buscador de propiedades ni reservas.
  */
 
 export default function HomePage() {
   return (
     <main id="contenido-principal" tabIndex={-1} className={styles.page}>
-      {/* HERO EDITORIAL */}
+      {/* HERO */}
 
       <section className={styles.hero} aria-labelledby="home-hero-title">
         <div className={styles.heroVisual}>
@@ -141,7 +140,7 @@ export default function HomePage() {
         </ContentContainer>
       </section>
 
-      {/* FUNCIONALIDAD REAL Y PRÓXIMOS PASOS */}
+      {/* RECORRIDO ACTUALIZADO */}
 
       <section
         id="como-funciona"
@@ -186,15 +185,14 @@ export default function HomePage() {
                   02
                 </span>
 
-                {/* M26.2 — La selección deja de ser pendiente. */}
                 <span className={styles.stepStatusReady}>Disponible</span>
               </div>
 
               <h3>Elige tu estancia</h3>
 
               <p>
-                En la página de una propiedad activa, selecciona fechas, calcula
-                las noches e indica cuántos huéspedes viajarán.
+                En una propiedad activa, selecciona fechas, calcula noches e
+                indica cuántos huéspedes viajarán.
               </p>
             </li>
 
@@ -204,14 +202,15 @@ export default function HomePage() {
                   03
                 </span>
 
-                <span className={styles.stepStatusUpcoming}>En desarrollo</span>
+                {/* M26.3: consulta real implementada. */}
+                <span className={styles.stepStatusReady}>Disponible</span>
               </div>
 
               <h3>Consulta tus opciones</h3>
 
               <p>
-                La disponibilidad y las cotizaciones se incorporarán conforme
-                avancemos en el flujo de reservas.
+                Consulta unidades disponibles, capacidad y cotizaciones
+                informativas para las fechas y huéspedes seleccionados.
               </p>
             </li>
           </ol>
@@ -219,9 +218,10 @@ export default function HomePage() {
           <div className={styles.journeyNote}>
             <p>
               <strong>¿Ya recibiste el enlace de un alojamiento?</strong> Puedes
-              abrirlo directamente, conocer su información y elegir fechas y
-              huéspedes. La consulta de disponibilidad y la reserva en línea
-              todavía no están habilitadas desde este recorrido.
+              abrirlo directamente para consultar su información, elegir tu
+              estancia y conocer alternativas reales. La selección de unidad y
+              la creación de reservas todavía no están habilitadas desde este
+              recorrido.
             </p>
           </div>
         </ContentContainer>

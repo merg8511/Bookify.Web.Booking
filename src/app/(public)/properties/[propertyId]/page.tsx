@@ -12,7 +12,6 @@ import { ApiErrorNotice } from "@/components/ui/api-error-notice";
 import { getPublicProperty } from "@/features/property/get-public-property";
 import { PROPERTY_EDITORIAL_MEDIA } from "@/features/property/property-media";
 
-// M26.2 — Selección de fechas y huéspedes.
 import { StaySelectionForm } from "@/features/booking/stay-selection/stay-selection-form";
 
 import { getTodayInPropertyTimeZone } from "@/features/booking/stay-selection/stay-dates";
@@ -23,13 +22,10 @@ import styles from "./page.module.css";
  * BOOKIFY — PROPERTY EDITORIAL P1
  *
  * M26.1: contexto real de Property.
- * M26.2: selección de fechas y huéspedes.
+ * M26.2: fechas y huéspedes.
+ * M26.3: disponibilidad y cotización.
  *
- * DS-001: Editorial Hospitality.
- * GEOM-001: Editorial Airy.
- * RESP-001: Editorial Continuity.
- *
- * No consulta disponibilidad ni precios.
+ * Sin creación de Booking ni selección de unidad.
  */
 
 type PropertyPageProps = {
@@ -170,7 +166,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     <main id="contenido-principal" tabIndex={-1} className={styles.page}>
       <ContentContainer>
         <div className={styles.content}>
-          {/* NAVEGACIÓN CONTEXTUAL — M26.1 */}
+          {/* M26.1 — Navegación contextual */}
 
           <nav aria-label="Ruta de navegación" className={styles.breadcrumb}>
             <Link href="/">Inicio</Link>
@@ -182,7 +178,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
             <span aria-current="page">Alojamiento</span>
           </nav>
 
-          {/* HERO EDITORIAL — M26.1 */}
+          {/* M26.1 — Hero editorial */}
 
           <section className={styles.hero} aria-labelledby="property-title">
             <header className={styles.heroCopy}>
@@ -206,13 +202,11 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
                 <p className={styles.statusExplanation}>
                   {property.isActive
-                    ? "El registro de esta propiedad está activo. La disponibilidad se consulta por separado."
+                    ? "El registro de esta propiedad está activo. Puedes consultar opciones reales para las fechas de tu estancia."
                     : "Esta propiedad figura como inactiva. No se muestran opciones para reservar."}
                 </p>
               </div>
             </header>
-
-            {/* Recurso ilustrativo, NO media de Property */}
 
             <figure className={styles.editorialFigure}>
               <div className={styles.editorialImageFrame}>
@@ -232,7 +226,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
             </figure>
           </section>
 
-          {/* DATOS REALES DEL BACKEND — M26.1 */}
+          {/* M26.1 — Información desde API */}
 
           <section
             className={styles.section}
@@ -253,31 +247,26 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
               <dl className={styles.details}>
                 <div className={styles.detail}>
                   <dt>Check-in</dt>
+
                   <dd>{formatTime(property.checkInTime)}</dd>
                 </div>
 
                 <div className={styles.detail}>
                   <dt>Check-out</dt>
+
                   <dd>{formatTime(property.checkOutTime)}</dd>
                 </div>
 
                 <div className={styles.detail}>
                   <dt>Zona horaria</dt>
+
                   <dd className={styles.timeZoneId}>{property.timeZoneId}</dd>
                 </div>
               </dl>
             </Surface>
           </section>
 
-          {/*
-           * M26.2 — NUEVA SECCIÓN FUNCIONAL.
-           *
-           * La propiedad activa permite seleccionar
-           * criterios, no confirmar disponibilidad.
-           *
-           * La propiedad inactiva NO muestra el
-           * formulario de reserva.
-           */}
+          {/* M26.3 — Introducción actualizada */}
 
           <section
             className={styles.nextStep}
@@ -294,7 +283,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
               <p className={styles.nextStepDescription}>
                 {property.isActive
-                  ? "Elige tus fechas y la cantidad de huéspedes. Podrás revisar los criterios antes de consultar opciones reales."
+                  ? "Elige tus fechas y huéspedes para conocer las opciones disponibles, su capacidad y su cotización informativa."
                   : "Puedes consultar la información del alojamiento, pero la selección de una nueva estancia no está habilitada."}
               </p>
             </div>
@@ -306,8 +295,11 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
             </div>
           </section>
 
+          {/* M26.3 — Selector y consulta real */}
+
           {property.isActive && (
             <StaySelectionForm
+              propertyId={property.id}
               todayInPropertyTimeZone={getTodayInPropertyTimeZone(
                 property.timeZoneId,
               )}
